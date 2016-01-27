@@ -8,15 +8,15 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.esterlorente.jediapp.MainActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.esterlorente.jediapp.CalculadoraActivity"></activity>
-        <activity android:name="com.esterlorente.jediapp.BanderaActivity"></activity>
+        <activity android:name=".CalculadoraActivity"></activity>
+        <activity android:name=".BanderaActivity"></activity>
     </application>
 
 </manifest>
