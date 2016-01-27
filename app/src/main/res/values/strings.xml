@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">JEDI App</string>
+    <string name="app_name">My Application</string>
+    <string name="pizza">Give me pizza</string>
+    <string name="burger">Give me burger</string>
+    <string name="settings">Settings</string>
+    <string name="exit">Exit</string>
 </resources>

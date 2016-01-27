@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/settings"
+        android:icon="@drawable/burger"
+        android:title="@string/settings"
+        app:showAsAction="always">
+        <menu android:checkableBehavior="single">
+            <item
+                android:id="@+id/red"
+                android:title="sub menu 1" />
+            <item
+                android:id="@+id/blue"
+                android:title="sub menu 2" />
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/exit"
+        android:title="@string/exit"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/pizza"
+        android:icon="@drawable/pizza"
+        android:title="@string/pizza"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/burger"
+        android:icon="@drawable/burger"
+        android:orderInCategory="10"
+        android:title="@string/burger"
+        app:showAsAction="always|withText" />
+
+</menu>
