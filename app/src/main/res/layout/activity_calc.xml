@@ -7,8 +7,7 @@
     android:orientation="vertical"
     tools:context=".CalculadoraActivity">
 
-    <android.support.v7.widget.Toolbar
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,15 +27,18 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center_vertical|right"
-            android:textSize="32dp" />
+            android:textSize="48dp"
+            android:text="56"
+            android:layout_marginRight="10dp" />
 
         <TextView
             android:id="@+id/text_res"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:gravity="center_vertical|right"
-            android:textSize="24dp" />
+            android:textSize="24dp"
+            android:layout_marginRight="10dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -59,6 +61,7 @@
 
                 <Button
                     android:id="@+id/button_7"
+                    style="?android:attr/borderlessButtonStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -70,6 +73,7 @@
 
                 <Button
                     android:id="@+id/button_8"
+                    style="?android:attr/borderlessButtonStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -81,6 +85,7 @@
 
                 <Button
                     android:id="@+id/button_9"
+                    style="?android:attr/borderlessButtonStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -100,6 +105,7 @@
 
                 <Button
                     android:id="@+id/button_4"
+                    style="?android:attr/borderlessButtonStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -111,6 +117,7 @@
 
                 <Button
                     android:id="@+id/button_5"
+                    style="?android:attr/borderlessButtonStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -122,6 +129,7 @@
 
                 <Button
                     android:id="@+id/button_6"
+                    style="?android:attr/borderlessButtonStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -141,6 +149,7 @@
 
                 <Button
                     android:id="@+id/button_1"
+                    style="?android:attr/borderlessButtonStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -152,6 +161,7 @@
 
                 <Button
                     android:id="@+id/button_2"
+                    style="?android:attr/borderlessButtonStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -164,6 +174,7 @@
 
                 <Button
                     android:id="@+id/button_3"
+                    style="?android:attr/borderlessButtonStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -183,6 +194,7 @@
 
                 <Button
                     android:id="@+id/button_dot"
+                    style="?android:attr/borderlessButtonStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -194,6 +206,7 @@
 
                 <Button
                     android:id="@+id/button_0"
+                    style="?android:attr/borderlessButtonStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -205,6 +218,7 @@
 
                 <Button
                     android:id="@+id/button_equ"
+                    style="?android:attr/borderlessButtonStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -226,6 +240,7 @@
 
             <Button
                 android:id="@+id/button_del"
+                style="?android:attr/borderlessButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -237,6 +252,7 @@
 
             <Button
                 android:id="@+id/button_div"
+                style="?android:attr/borderlessButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -248,6 +264,7 @@
 
             <Button
                 android:id="@+id/button_prod"
+                style="?android:attr/borderlessButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -259,6 +276,7 @@
 
             <Button
                 android:id="@+id/button_min"
+                style="?android:attr/borderlessButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -270,6 +288,7 @@
 
             <Button
                 android:id="@+id/button_plus"
+                style="?android:attr/borderlessButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"

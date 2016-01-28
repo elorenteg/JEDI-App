@@ -11,6 +11,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,7 +23,7 @@ import android.widget.Toast;
 public class CalculadoraActivity extends AppCompatActivity implements View.OnClickListener {
     private String TAG = "ACTIVITY_2_TAG";
 
-    private TextView textOper;
+    private TextView textOper, textRes;
     private Button button0, button1, button2, button3, button4, button5, button6, button7, button8, button9;
     private Button buttonPlus, buttonMin, buttonProd, buttonDiv, buttonDot, buttonEqu, buttonDel;
 
@@ -37,14 +41,15 @@ public class CalculadoraActivity extends AppCompatActivity implements View.OnCli
 
         textOper = (TextView) findViewById(R.id.text_oper);
         textOper.setText("");
+        textRes = (TextView) findViewById(R.id.text_res);
+        textRes.setText("");
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             String value = bundle.getString("editTextOper");
             Log.e(TAG, value);
             textOper.setText(value);
-        }
-        else Log.e(TAG, "Intent - No hay valor");
+        } else Log.e(TAG, "Intent - No hay valor");
 
         button0 = (Button) findViewById(R.id.button_0);
         button1 = (Button) findViewById(R.id.button_1);
@@ -121,23 +126,29 @@ public class CalculadoraActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onSaveInstanceState(Bundle outstate) {
         super.onSaveInstanceState(outstate);
-        TextView t = (TextView) findViewById(R.id.text_oper);
-        outstate.putString("textOper", t.getText().toString());
-        Log.v(TAG, "Guardando resultado: " + t.getText().toString());
+
+        outstate.putString("textOper", textOper.getText().toString());
+        Log.v(TAG, "Guardando textOper: " + textOper.getText().toString());
+
+        outstate.putString("textRes", textRes.getText().toString());
+        Log.v(TAG, "Guardando textRes: " + textRes.getText().toString());
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        TextView t = (TextView) findViewById(R.id.text_oper);
-        t.setText(savedInstanceState.getString("textOper"));
-        Log.v(TAG, "Restableciendo resultado: " + savedInstanceState.getString("textOper"));
+
+        textOper.setText(savedInstanceState.getString("textOper"));
+        Log.v(TAG, "Restableciendo textOper: " + savedInstanceState.getString("textOper"));
+
+        textRes.setText(savedInstanceState.getString("textRes"));
+        Log.v(TAG, "Restableciendo textRes: " + savedInstanceState.getString("textRes"));
     }
 
 
     @Override
     public void onClick(View v) {
-        String text = (String) textOper.getText();
+        String text = textOper.getText().toString();
         switch (v.getId()) {
             case R.id.button_0:
                 textOper.setText(text + "0");
@@ -184,20 +195,98 @@ public class CalculadoraActivity extends AppCompatActivity implements View.OnCli
             case R.id.button_dot:
                 textOper.setText(text + ".");
                 break;
-            case R.id.button_equ:
-                try {
-                    textOper.setText(String.valueOf(new Parser().parse((String) text)));
-                } catch (RuntimeException e) {
-                    Context context = getApplicationContext();
-                    CharSequence toastText = "Invalid Expression";
-                    Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
-                }
-                break;
             case R.id.button_del:
                 if (text.length() > 0)
                     textOper.setText(text.subSequence(0, text.length() - 1));
                 break;
         }
+
+        final String result;
+        switch (v.getId()) {
+            case R.id.button_0:
+            case R.id.button_1:
+            case R.id.button_2:
+            case R.id.button_3:
+            case R.id.button_4:
+            case R.id.button_5:
+            case R.id.button_6:
+            case R.id.button_7:
+            case R.id.button_8:
+            case R.id.button_9:
+            case R.id.button_dot:
+            case R.id.button_del:
+                result = evaluateExpression(textOper.getText().toString());
+                textRes.setText(String.valueOf(result).replaceAll("\\.0*$", ""));
+                break;
+            case R.id.button_equ:
+                result = evaluateExpression(textOper.getText().toString());
+
+                Animation animOper = AnimationUtils.loadAnimation(this, R.anim.calc_oper);
+                animOper.reset();
+                textOper.clearAnimation();
+                animOper.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation arg0) {
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation arg0) {
+                        if (textRes.getText().equals("")) textOper.setText("");
+                        else textOper.setText(result);
+                    }
+                });
+                textOper.startAnimation(animOper);
+
+                Animation animRes = AnimationUtils.loadAnimation(this, R.anim.calc_res);
+                animRes.reset();
+                textRes.clearAnimation();
+
+                animRes.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation arg0) {
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation arg0) {
+                        textRes.setText("");
+                    }
+                });
+                textRes.startAnimation(animRes);
+
+                /*
+                AnimationSet animation = new AnimationSet(false);
+                Animation  moveDownUp = new TranslateAnimation(0, 0, 0, -textRes.getHeight());
+                moveDownUp.setDuration(700);
+                animation.addAnimation(moveDownUp);
+                animation.addAnimation(animRes);
+                textRes.startAnimation(animation);
+                */
+
+                break;
+        }
+    }
+
+    private String evaluateExpression(String text) {
+        text = (String) textOper.getText();
+        MathEval math = new MathEval();
+        Context context = getApplicationContext();
+        double result = -1;
+        try {
+            result = math.evaluate(text);
+        } catch (NumberFormatException e) {
+            Toast.makeText(context, "NumberFormatException", Toast.LENGTH_SHORT).show();
+        } catch (ArithmeticException e) {
+            Toast.makeText(context, "ArithmeticException", Toast.LENGTH_SHORT).show();
+        }
+        return String.valueOf(result).replaceAll("\\.0*$", "");
     }
 
 

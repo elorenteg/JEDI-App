@@ -6,7 +6,7 @@ public class Parser_new {
     private int pos = -1, c;
 
     public double parse(String text) {
-        this.text = text;
+        this.text = text.replace(" ", "");
         eatChar();
         double v = parseExpression();
         if (c != -1) throw new RuntimeException("Unexpected: " + (char) c);
