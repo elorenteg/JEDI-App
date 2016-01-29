@@ -8,7 +8,8 @@
         android:title="@string/pizza"
         app:showAsAction="ifRoom" />
 
-    <item android:id="@+id/burger"
+    <item
+        android:id="@+id/burger"
         android:icon="@drawable/burger"
         app:showAsAction="ifRoom"
         android:title="@string/burger" />

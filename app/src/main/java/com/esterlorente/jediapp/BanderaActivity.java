@@ -1,10 +1,10 @@
 package com.esterlorente.jediapp;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 public class BanderaActivity extends AppCompatActivity {
-    private String TAG = "ACTIVITY_3_TAG";
+    private String TAG = "BANDERA_ACTIVITY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
