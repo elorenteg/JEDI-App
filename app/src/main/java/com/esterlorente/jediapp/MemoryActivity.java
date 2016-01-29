@@ -46,6 +46,20 @@ public class MemoryActivity extends AppCompatActivity implements View.OnClickLis
         initCards();
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outstate) {
+        super.onSaveInstanceState(outstate);
+
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+
+    }
+
     private void initCards() {
         final LinearLayout linearLayout = (LinearLayout) findViewById(R.id.layoutCards);
         linearLayout.post(new Runnable() {

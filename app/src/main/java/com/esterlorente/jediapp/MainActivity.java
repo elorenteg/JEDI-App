@@ -1,21 +1,35 @@
 package com.esterlorente.jediapp;
 
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import com.esterlorente.jediapp.data.LoginHelper;
 
 public class MainActivity extends AppCompatActivity {
     private String TAG = "MAIN_ACTIVITY";
 
-    private EditText editText;
-    private Button button;
+    private Context context;
+    private LoginHelper loginHelper;
+
+    private EditText editCalc;
+    private EditText editMemory;
+    private EditText editName;
+    private EditText editPass;
+    private Button buttonCalc;
+    private Button buttonMemory;
+    private Button buttonInsert;
+    private Button buttonLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,28 +45,31 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        button = (Button) findViewById(R.id.button);
-        editText = (EditText) findViewById(R.id.editText);
+        context = getApplicationContext();
+        loginHelper = new LoginHelper(context);
+
+        buttonCalc = (Button) findViewById(R.id.buttonCalc);
+        editCalc = (EditText) findViewById(R.id.editCalc);
         View.OnClickListener lis = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), CalculadoraActivity.class);
                 Bundle bundle = new Bundle();
-                String text = editText.getText().toString();
+                String text = editCalc.getText().toString();
                 bundle.putString("editTextOper", text);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
         };
-        button.setOnClickListener(lis);
+        buttonCalc.setOnClickListener(lis);
 
-        button = (Button) findViewById(R.id.button3);
-        editText = (EditText) findViewById(R.id.editText2);
+        buttonMemory = (Button) findViewById(R.id.buttonMemory);
+        editMemory = (EditText) findViewById(R.id.editMemory);
         View.OnClickListener lis2 = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), MemoryActivity.class);
-                String text = editText.getText().toString();
+                String text = editMemory.getText().toString();
                 if (!text.equals("")) {
                     Bundle bundle = new Bundle();
                     bundle.putInt("editNumCards", Integer.valueOf(text));
@@ -61,7 +78,44 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         };
-        button.setOnClickListener(lis2);
+        buttonMemory.setOnClickListener(lis2);
+
+        buttonInsert = (Button) findViewById(R.id.buttonInsert);
+        buttonLogin = (Button) findViewById(R.id.buttonLogin);
+        editName = (EditText) findViewById(R.id.editName);
+        editPass = (EditText) findViewById(R.id.editPass);
+        View.OnClickListener lis3 = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MemoryActivity.class);
+                String name = editName.getText().toString();
+                String pass = editPass.getText().toString();
+
+                if (!userExists(name)) {
+                    Toast.makeText(context, "Nuevo usuario: " + name + " + " + pass, Toast.LENGTH_SHORT).show();
+                    createUser(name, pass);
+                } else {
+                    Toast.makeText(context, "Usuario ya existe con ese username", Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+        buttonInsert.setOnClickListener(lis3);
+
+        View.OnClickListener lis4 = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MemoryActivity.class);
+                String name = editName.getText().toString();
+                String pass = editPass.getText().toString();
+
+                if (userCorrect(name, pass)) {
+                    Toast.makeText(context, "Login correcto!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, "Usuario incorrecto", Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+        buttonLogin.setOnClickListener(lis4);
     }
 
     @Override
@@ -74,24 +128,30 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.pizza:
-                giveMeAPizza();
-                return true;
-            case R.id.burger:
-                giveMeABurger();
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void giveMeABurger() {
-        Log.v("Burger", "Give me a burger!");
+    private boolean userExists(String name) {
+        Cursor cursor = loginHelper.getUserByName(name);
+        return cursor.moveToFirst();
     }
 
-    private void giveMeAPizza() {
-        Log.v("Pizza", "Give me a pizza!");
+    private boolean userCorrect(String name, String pass) {
+        Cursor cursor = loginHelper.getUserByName(name);
+        if (cursor.moveToFirst()) {
+            // User exists
+            String passSaved = cursor.getString(cursor.getColumnIndex("password"));
+            return pass.equals(passSaved);
+        }
+        return false;
     }
 
-
+    private void createUser(String name, String pass) {
+        ContentValues valuesToStore = new ContentValues();
+        valuesToStore.put("username", name);
+        valuesToStore.put("password", pass);
+        loginHelper.createUser(valuesToStore, "USER");
+    }
 }
