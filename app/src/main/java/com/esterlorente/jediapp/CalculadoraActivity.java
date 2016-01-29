@@ -26,7 +26,7 @@ import android.widget.Toast;
 
 
 public class CalculadoraActivity extends AppCompatActivity implements View.OnClickListener {
-    private String TAG = "ACTIVITY_2_TAG";
+    private String TAG = "CALCULADORA_ACTIVITY";
 
     private TextView textOper, textRes;
     private Button button0, button1, button2, button3, button4, button5, button6, button7, button8, button9;
@@ -52,7 +52,7 @@ public class CalculadoraActivity extends AppCompatActivity implements View.OnCli
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             String value = bundle.getString("editTextOper");
-            Log.e(TAG, value);
+            Log.e(TAG, "Paso valor: " + value);
             textOper.setText(value);
         } else Log.e(TAG, "Intent - No hay valor");
 

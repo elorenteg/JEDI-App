@@ -4,4 +4,10 @@
     <string name="burger">Give me burger</string>
     <string name="settings">Settings</string>
     <string name="exit">Exit</string>
+    <string name="title_activity_memory">MemoryActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="intents">Num. attempts</string>
+    <string name="restart">Restart</string>
 </resources>

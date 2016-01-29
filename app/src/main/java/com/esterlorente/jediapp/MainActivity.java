@@ -10,9 +10,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
-    private String TAG = "MAIN_ACTIVITY_TAG";
+    private String TAG = "MAIN_ACTIVITY";
 
     private EditText editText;
     private Button button;
@@ -22,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(getIntent().getBooleanExtra("Exit me", false)){
+        if (getIntent().getBooleanExtra("Exit me", false)) {
             finish();
             return; // add this to prevent from doing unnecessary stuffs
         }
@@ -33,9 +34,9 @@ public class MainActivity extends AppCompatActivity {
 
         button = (Button) findViewById(R.id.button);
         editText = (EditText) findViewById(R.id.editText);
-        View.OnClickListener lis = new View.OnClickListener(){
+        View.OnClickListener lis = new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), CalculadoraActivity.class);
                 Bundle bundle = new Bundle();
                 String text = editText.getText().toString();
@@ -45,6 +46,23 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         button.setOnClickListener(lis);
+
+        button = (Button) findViewById(R.id.button3);
+        editText = (EditText) findViewById(R.id.editText2);
+        View.OnClickListener lis2 = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MemoryActivity.class);
+                String text = editText.getText().toString();
+                if (!text.equals("")) {
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("editNumCards", Integer.valueOf(text));
+                    intent.putExtras(bundle);
+                }
+                startActivity(intent);
+            }
+        };
+        button.setOnClickListener(lis2);
     }
 
     @Override
