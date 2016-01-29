@@ -19,7 +19,11 @@
         <activity android:name=".BanderaActivity" />
         <activity
             android:name=".MemoryActivity"
-            android:label="@string/title_activity_memory"></activity>
+            android:label="@string/title_activity_memory" />
+        <activity
+            android:name=".LogedActivity"
+            android:label="@string/title_activity_loged"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

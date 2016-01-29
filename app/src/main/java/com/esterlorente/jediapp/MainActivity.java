@@ -22,12 +22,8 @@ public class MainActivity extends AppCompatActivity {
     private Context context;
     private LoginHelper loginHelper;
 
-    private EditText editCalc;
-    private EditText editMemory;
     private EditText editName;
     private EditText editPass;
-    private Button buttonCalc;
-    private Button buttonMemory;
     private Button buttonInsert;
     private Button buttonLogin;
 
@@ -48,37 +44,6 @@ public class MainActivity extends AppCompatActivity {
         context = getApplicationContext();
         loginHelper = new LoginHelper(context);
 
-        buttonCalc = (Button) findViewById(R.id.buttonCalc);
-        editCalc = (EditText) findViewById(R.id.editCalc);
-        View.OnClickListener lis = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), CalculadoraActivity.class);
-                Bundle bundle = new Bundle();
-                String text = editCalc.getText().toString();
-                bundle.putString("editTextOper", text);
-                intent.putExtras(bundle);
-                startActivity(intent);
-            }
-        };
-        buttonCalc.setOnClickListener(lis);
-
-        buttonMemory = (Button) findViewById(R.id.buttonMemory);
-        editMemory = (EditText) findViewById(R.id.editMemory);
-        View.OnClickListener lis2 = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MemoryActivity.class);
-                String text = editMemory.getText().toString();
-                if (!text.equals("")) {
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("editNumCards", Integer.valueOf(text));
-                    intent.putExtras(bundle);
-                }
-                startActivity(intent);
-            }
-        };
-        buttonMemory.setOnClickListener(lis2);
 
         buttonInsert = (Button) findViewById(R.id.buttonInsert);
         buttonLogin = (Button) findViewById(R.id.buttonLogin);
@@ -87,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         View.OnClickListener lis3 = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MemoryActivity.class);
+                Intent intent = new Intent(context, MemoryActivity.class);
                 String name = editName.getText().toString();
                 String pass = editPass.getText().toString();
 
@@ -104,12 +69,17 @@ public class MainActivity extends AppCompatActivity {
         View.OnClickListener lis4 = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MemoryActivity.class);
+                Intent intent = new Intent(context, MemoryActivity.class);
                 String name = editName.getText().toString();
                 String pass = editPass.getText().toString();
 
                 if (userCorrect(name, pass)) {
                     Toast.makeText(context, "Login correcto!", Toast.LENGTH_SHORT).show();
+                    intent = new Intent(context, LogedActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("username", name);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
                 } else {
                     Toast.makeText(context, "Usuario incorrecto", Toast.LENGTH_SHORT).show();
                 }
