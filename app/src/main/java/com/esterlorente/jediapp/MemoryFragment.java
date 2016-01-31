@@ -13,11 +13,9 @@ import android.widget.LinearLayout;
 
 import com.example.material.joanbarroso.flipper.CoolImageFlipper;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -28,11 +26,8 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
     private View rootView;
 
     private int numCards = 4;
-
-    private ArrayList<ImageView> listCards;
-    private ArrayList<Integer> idsCards;
-    private List<Integer> asignCards;
-    private List<Integer> stateCards;
+    ArrayList<Integer> idsCards;
+    private ArrayList<CardMemory> listCards;
 
     CoolImageFlipper coolImageFlipper;
 
@@ -72,12 +67,11 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
 
     private void drawCards(int width, int height) {
         LinearLayout linearLayout = (LinearLayout) rootView.findViewById(R.id.layoutCards);
-        boolean initialize = idsCards == null;
+        boolean initialize = listCards == null;
         if (initialize) {
             idsCards = new ArrayList();
-            stateCards = new ArrayList(Collections.nCopies(numCards * numCards, R.drawable.cover));
+            listCards = new ArrayList();
         }
-        listCards = new ArrayList();
         int id = 0;
 
         for (int i = 0; i < numCards; ++i) {
@@ -86,11 +80,26 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
             rowLayout.setGravity(Gravity.CENTER_HORIZONTAL);
 
             for (int j = 0; j < numCards; ++j) {
+                CardMemory cardMemory;
                 ImageView card = new ImageView(context);
                 if (initialize) {
+                    cardMemory = new CardMemory();
+                    cardMemory.setStateCard(R.drawable.cover);
+
                     card.setImageResource(R.drawable.cover);
+
+                    // Asignacion dinamica de IDs a los ImageView
+                    View v = (View) rootView.findViewById(id);
+                    while (v != null || idsCards.indexOf(id) != -1) {
+                        v = rootView.findViewById(++id);
+                    }
+                    card.setId(id);
+                    idsCards.add(id);
                 } else {
-                    card.setImageResource(stateCards.get(i * numCards + j));
+                    cardMemory = listCards.get(i * numCards + j);
+
+                    card.setImageResource(listCards.get(i * numCards + j).getStateCard());
+                    card.setId(idsCards.get(i * numCards + j));
                 }
 
                 int w = width / numCards;
@@ -100,34 +109,20 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
                 LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(w, h);
                 card.setLayoutParams(parms);
                 card.setOnClickListener(this);
+                cardMemory.setCard(card);
 
-                if (initialize) {
-                    // Asignacion dinamica de IDs a los ImageView
-                    View v = (View) rootView.findViewById(id);
-                    while (v != null || idsCards.indexOf(id) != -1) {
-                        v = rootView.findViewById(++id);
-                    }
-                    card.setId(id);
-                    card.setTag(R.drawable.cover);
-                    idsCards.add(card.getId());
-                } else {
-                    card.setId(idsCards.get(i * numCards + j));
-                    card.setTag(stateCards.get(i * numCards + j));
-                }
-
-                listCards.add(card);
+                listCards.add(cardMemory);
                 rowLayout.addView(card);
             }
             linearLayout.addView(rowLayout);
         }
 
-        if (initialize) assignCards();
+        if (initialize) assignCards(idsCards);
     }
 
-    private void assignCards() {
+    private void assignCards(ArrayList<Integer> idsCards) {
         ArrayList<Integer> possibleCards = new ArrayList();
         possibleCards.addAll(Arrays.asList(R.drawable.carta1, R.drawable.carta2, R.drawable.carta3, R.drawable.carta4, R.drawable.carta1, R.drawable.carta2, R.drawable.carta3, R.drawable.carta4));
-        asignCards = Arrays.asList(new Integer[numCards * numCards]);
 
         ArrayList<Integer> randIds = new ArrayList(idsCards);
         Collections.shuffle(randIds);
@@ -139,34 +134,41 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
             int pos1 = idsCards.indexOf(rand1);
             int pos2 = idsCards.indexOf(rand2);
 
-            asignCards.set(pos1, possibleCards.get(i));
-            asignCards.set(pos2, possibleCards.get(i));
+            CardMemory card1 = listCards.get(pos1);
+            CardMemory card2 = listCards.get(pos2);
+
+            card1.setAsignCard(possibleCards.get(i));
+            card2.setAsignCard(possibleCards.get(i));
+
+            listCards.set(pos1, card1);
+            listCards.set(pos2, card2);
         }
     }
 
     @Override
     public void onClick(View view) {
-        int pos = idsCards.indexOf(view.getId());
         int id = view.getId();
-        ImageView card = (ImageView) rootView.findViewById(id);
+        int pos = idsCards.indexOf(id);
+
+        CardMemory cardMemory = listCards.get(pos);
         Log.e(TAG, "Click en carta " + id);
 
-        switch ((Integer) card.getTag()) {
+        switch (cardMemory.getStateCard()) {
             case R.drawable.cover:
-                stateCards.set(pos, asignCards.get(pos));
-                card.setTag(stateCards.get(pos));
+                cardMemory.setStateCard(cardMemory.getAsignCard());
+                listCards.set(pos, cardMemory);
 
-                Log.e(TAG, "Carta " + pos + " - imagen " + stateCards.get(pos));
+                Log.e(TAG, "Carta " + pos + " - imagen " + cardMemory.getStateCard());
 
-                coolImageFlipper.flipImage(context.getDrawable(stateCards.get(pos)), card);
+                coolImageFlipper.flipImage(context.getDrawable(cardMemory.getStateCard()), cardMemory.getCard());
                 break;
             default:
-                stateCards.set(pos, R.drawable.cover);
-                card.setTag(R.drawable.cover);
+                cardMemory.setStateCard(R.drawable.cover);
+                listCards.set(pos, cardMemory);
 
-                Log.e(TAG, "Carta " + pos + " - imagen " + stateCards.get(pos));
+                Log.e(TAG, "Carta " + pos + " - imagen " + cardMemory.getStateCard());
 
-                coolImageFlipper.flipImage(context.getDrawable(R.drawable.cover), card);
+                coolImageFlipper.flipImage(context.getDrawable(R.drawable.cover), cardMemory.getCard());
                 break;
         }
     }
@@ -177,9 +179,8 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
 
         Log.e(TAG, "Guardando datos");
 
-        outstate.putSerializable("idsCards", (Serializable) idsCards);
-        outstate.putSerializable("asignCards", (Serializable) asignCards);
-        outstate.putSerializable("stateCards", (Serializable) stateCards);
+        outstate.putIntegerArrayList("idsCards", idsCards);
+        outstate.putParcelableArrayList("listCards", listCards);
     }
 
     @Override
@@ -189,9 +190,8 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         if (savedInstanceState != null) {
             Log.e(TAG, "Restaurando datos");
 
-            idsCards = (ArrayList) savedInstanceState.getSerializable("idsCards");
-            asignCards = (List) savedInstanceState.getSerializable("asignCards");
-            stateCards = (List) savedInstanceState.getSerializable("stateCards");
+            idsCards = (ArrayList) savedInstanceState.getIntegerArrayList("idsCards");
+            listCards = (ArrayList) savedInstanceState.getParcelableArrayList("listCards");
 
             initCards();
         } else {
