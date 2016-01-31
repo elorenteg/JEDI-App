@@ -3,19 +3,26 @@ package com.esterlorente.jediapp;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
-import com.esterlorente.jediapp.data.LoginHelper;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
-    private String TAG = "LOGED_ACTIVITY";
+    private String TAG = "MAIN_ACTIVITY";
 
     private Context context;
-    private LoginHelper loginHelper;
+    private Toolbar toolbar;
+    private NavigationView navigationView;
+    private DrawerLayout drawerLayout;
+
+    private MenuItem prevMenuItem = null;
 
     private EditText editCalc;
     private Button buttonCalc;
@@ -32,10 +39,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Anadir Toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         context = getApplicationContext();
+
+        initNavigationDrawer();
+
+        ///
 
         buttonCalc = (Button) findViewById(R.id.buttonCalc);
         editCalc = (EditText) findViewById(R.id.editCalc);
@@ -85,6 +96,72 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         buttonWeird.setOnClickListener(lis3);
+    }
+
+    private void initNavigationDrawer() {
+        navigationView = (NavigationView) findViewById(R.id.navview);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        // Setting Navigation View Item Selected Listener to handle the item click of the navigation menu
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            // This method will trigger on item Click of navigation menu
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+
+                // Checking if the item is in checked state or not, if not make it in checked state
+                if (menuItem.isChecked()) { // prevMenuItem = menuItem
+                    menuItem.setChecked(false);
+                    prevMenuItem = null;
+                } else { // prevMenuItem = null or another menuItem
+                    menuItem.setChecked(true);
+                    if (prevMenuItem != null) prevMenuItem.setChecked(false);
+                    prevMenuItem = menuItem;
+                }
+
+                // Closing drawer on item click
+                drawerLayout.closeDrawers();
+
+                // Check to see which item was being clicked and perform appropriate action
+                switch (menuItem.getItemId()) {
+                    case R.id.menu_music:
+                        Toast.makeText(context, "Music selected", Toast.LENGTH_SHORT).show();
+                        break;
+
+                    case R.id.menu_game:
+                        Toast.makeText(context, "Game Selected", Toast.LENGTH_SHORT).show();
+                        break;
+
+                    case R.id.menu_calculator:
+                        Toast.makeText(context, "Calculator Selected", Toast.LENGTH_SHORT).show();
+                        break;
+
+                    case R.id.menu_settiongs:
+                        Toast.makeText(context, "Settings Selected", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                return true;
+            }
+        });
+
+        // Initializing Drawer Layout and ActionBarToggle
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.openDrawer, R.string.closeDrawer) {
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
+        };
+
+        // Setting the actionbarToggle to drawer layout
+        drawerLayout.setDrawerListener(actionBarDrawerToggle);
+
+        // calling sync state is necessay or else your hamburger icon wont show up
+        actionBarDrawerToggle.syncState();
     }
 
 }
