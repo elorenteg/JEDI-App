@@ -3,6 +3,7 @@ package com.esterlorente.jediapp;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -38,7 +39,6 @@ public class SignupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_signup);
 
         context = getApplicationContext();
-
         loginHelper = new LoginHelper(context);
 
         buttonCreateAccount = (Button) findViewById(R.id.buttonCreateAccount);
@@ -55,6 +55,12 @@ public class SignupActivity extends AppCompatActivity {
                 if (validateNewUser(name, pass, email)) {
                     // Datos validos
                     Toast.makeText(context, "Nuevo usuario: " + name + " + " + pass, Toast.LENGTH_SHORT).show();
+
+                    SharedPreferences pref = context.getSharedPreferences("MyPref", Context.MODE_PRIVATE);
+                    final SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("key_username", name); // Storing string
+                    editor.commit(); // commit changes
+
                     createUser(name, pass);
                     loginUser();
                 }
@@ -75,9 +81,6 @@ public class SignupActivity extends AppCompatActivity {
 
     private void loginUser() {
         Intent intent = new Intent(context, MainActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("username", username);
-        intent.putExtras(bundle);
         startActivity(intent);
     }
 

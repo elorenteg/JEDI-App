@@ -2,10 +2,10 @@ package com.esterlorente.jediapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,8 +22,6 @@ public class LoginActivity extends AppCompatActivity {
     private Context context;
     private LoginHelper loginHelper;
 
-    private String username = null;
-
     private EditText editName;
     private EditText editPass;
     private Button buttonLogin;
@@ -36,6 +34,10 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         context = getApplicationContext();
+
+        SharedPreferences pref = context.getSharedPreferences("MyPref", Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editor = pref.edit();
+        String username = pref.getString("key_username", null); // getting String
 
         if (username == null) {
             // No hay usuario logeado
@@ -52,7 +54,9 @@ public class LoginActivity extends AppCompatActivity {
 
                     if (validateUser(name, pass)) {
                         Toast.makeText(context, "Login correcto!", Toast.LENGTH_SHORT).show();
-                        username = name;
+
+                        editor.putString("key_username", name); // Storing string
+                        editor.commit(); // commit changes
 
                         loginUser();
                     }
@@ -77,9 +81,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private void loginUser() {
         Intent intent = new Intent(context, MainActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("username", username);
-        intent.putExtras(bundle);
         startActivity(intent);
     }
 
@@ -130,21 +131,5 @@ public class LoginActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outstate) {
-        super.onSaveInstanceState(outstate);
-
-        outstate.putString("username", username);
-        Log.v(TAG, "Guardando username: " + username);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-
-        username = (savedInstanceState.getString("username"));
-        Log.v(TAG, "Restableciendo username: " + savedInstanceState.getString("username"));
     }
 }
