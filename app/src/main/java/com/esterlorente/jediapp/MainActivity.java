@@ -2,17 +2,24 @@ package com.esterlorente.jediapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.esterlorente.jediapp.data.LoginHelper;
 
 public class MainActivity extends AppCompatActivity {
     private String TAG = "MAIN_ACTIVITY";
@@ -21,8 +28,10 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
+    private LoginHelper loginHelper;
 
     private MenuItem prevMenuItem = null;
+    private String username;
 
     private EditText editCalc;
     private Button buttonCalc;
@@ -43,6 +52,12 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         context = getApplicationContext();
+        loginHelper = new LoginHelper(context);
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            username = bundle.getString("username");
+        }
 
         initNavigationDrawer();
 
@@ -102,6 +117,20 @@ public class MainActivity extends AppCompatActivity {
         navigationView = (NavigationView) findViewById(R.id.navview);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
+        View header = navigationView.getHeaderView(0);
+        TextView textUsername = (TextView) header.findViewById(R.id.navview_username);
+        textUsername.setText(username);
+
+        ImageView imageUsername = (ImageView) header.findViewById(R.id.navview_image);
+        Cursor cursor = loginHelper.getUserImageByName(username);
+        if (cursor.moveToFirst()) {
+            if (!cursor.isNull(0)) {
+                Log.e(TAG, "Cursor con fila y valor");
+                byte[] image = cursor.getBlob(1);
+                imageUsername.setImageBitmap(BitmapFactory.decodeByteArray(image, 0, image.length));
+            } else Log.e(TAG, "Cursor con fila, pero valor null");
+        }
+
         // Setting Navigation View Item Selected Listener to handle the item click of the navigation menu
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             // This method will trigger on item Click of navigation menu
@@ -129,10 +158,12 @@ public class MainActivity extends AppCompatActivity {
 
                     case R.id.menu_game:
                         Toast.makeText(context, "Game Selected", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(context, GameActivity.class));
                         break;
 
                     case R.id.menu_calculator:
                         Toast.makeText(context, "Calculator Selected", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(context, CalculadoraActivity.class));
                         break;
 
                     case R.id.menu_settiongs:

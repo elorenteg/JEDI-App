@@ -58,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
                         editor.putString("key_username", name); // Storing string
                         editor.commit(); // commit changes
 
-                        loginUser();
+                        loginUser(name);
                     }
                 }
             };
@@ -75,12 +75,17 @@ public class LoginActivity extends AppCompatActivity {
             textNoAccount.setOnClickListener(lis2);
         } else {
             // Usuario ya se habia logeado
-            loginUser();
+            loginUser(username);
         }
     }
 
-    private void loginUser() {
+    private void loginUser(String username) {
         Intent intent = new Intent(context, MainActivity.class);
+
+        Bundle bundle = new Bundle();
+        bundle.putString("username", username);
+        intent.putExtras(bundle);
+
         startActivity(intent);
     }
 

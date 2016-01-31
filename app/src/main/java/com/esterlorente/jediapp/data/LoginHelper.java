@@ -8,17 +8,29 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class LoginHelper extends SQLiteOpenHelper {
 
-    //Declaracion del nombre de la base de datos
-    public static final int DATABASE_VERSION = 2;
+    // Declaracion del nombre de la base de datos
+    public static final int DATABASE_VERSION = 3;
 
-    //Declaracion global de la version de la base de datos
+    // Declaracion global de la version de la base de datos
     public static final String DATABASE_NAME = "USER_DB";
 
-    //Declaracion del nombre de la tabla
+    // Declaracion del nombre de la tabla
     public static final String USER_TABLE = "USER";
 
-    //sentencia global de cracion de la base de datos
-    public static final String USER_TABLE_CREATE = "CREATE TABLE " + USER_TABLE + " (username TEXT PRIMARY KEY UNIQUE, password TEXT);";
+    // Declaracion de las columnas de la tabla
+    public static final String USERNAME = "username";
+    public static final String PASSWORD = "password";
+    public static final String EMAIL = "email";
+    public static final String IMAGE = "image";
+    public static final String STREET = "street";
+
+    // sentencia global de cracion de la base de datos
+    public static final String USER_TABLE_CREATE = "CREATE TABLE " + USER_TABLE + " (" +
+            USERNAME + " TEXT PRIMARY KEY UNIQUE, " +
+            PASSWORD + " TEXT, " +
+            EMAIL + " TEXT, " +
+            IMAGE + " BLOB, " +
+            STREET + " TEXT );";
 
 
     public LoginHelper(Context context) {
@@ -32,7 +44,7 @@ public class LoginHelper extends SQLiteOpenHelper {
 
     public Cursor getAllUsers() {
         SQLiteDatabase db = this.getWritableDatabase();
-        String[] columns = {"username", "password"};
+        String[] columns = {USERNAME, PASSWORD};
         Cursor c = db.query(
                 USER_TABLE,                             // The table to query
                 columns,                                // The columns to return
@@ -47,12 +59,28 @@ public class LoginHelper extends SQLiteOpenHelper {
 
     public Cursor getUserByName(String username) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String[] columns = {"username", "password"};
+        String[] columns = {USERNAME, PASSWORD};
         String[] where = {username};
         Cursor c = db.query(
                 USER_TABLE,                             // The table to query
                 columns,                                // The columns to return
-                "username=?",                           // The columns for the WHERE clause
+                USERNAME + "=?",                        // The columns for the WHERE clause
+                where,                                  // The values for the WHERE clause
+                null,                                   // don't group the rows
+                null,                                   // don't filter by row groups
+                null                                    // The sort order
+        );
+        return c;
+    }
+
+    public Cursor getUserImageByName(String username) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String[] columns = {IMAGE};
+        String[] where = {username};
+        Cursor c = db.query(
+                USER_TABLE,                             // The table to query
+                columns,                                // The columns to return
+                USERNAME + "=?",                        // The columns for the WHERE clause
                 where,                                  // The values for the WHERE clause
                 null,                                   // don't group the rows
                 null,                                   // don't filter by row groups

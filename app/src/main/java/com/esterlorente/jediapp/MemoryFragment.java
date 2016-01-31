@@ -16,8 +16,7 @@ import com.example.material.joanbarroso.flipper.CoolImageFlipper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -30,7 +29,7 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
     private int numCards = 4;
     private ArrayList<ImageView> listCards;
     private ArrayList<Integer> idsCards;
-    private Map<Integer, Integer> asignCards;
+    private List<Integer> asignCards;
     CoolImageFlipper coolImageFlipper;
 
     public MemoryFragment() {
@@ -113,7 +112,7 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
     private void assignCards() {
         ArrayList<Integer> possibleCards = new ArrayList();
         possibleCards.addAll(Arrays.asList(R.drawable.carta1, R.drawable.carta2, R.drawable.carta3, R.drawable.carta4, R.drawable.carta1, R.drawable.carta2, R.drawable.carta3, R.drawable.carta4));
-        asignCards = new HashMap<Integer, Integer>();
+        asignCards = Arrays.asList(new Integer[numCards * numCards]);
 
         ArrayList<Integer> randIds = new ArrayList(idsCards);
         Collections.shuffle(randIds);
@@ -125,8 +124,8 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
             int pos1 = idsCards.indexOf(rand1);
             int pos2 = idsCards.indexOf(rand2);
 
-            asignCards.put(pos1, possibleCards.get(i));
-            asignCards.put(pos2, possibleCards.get(i));
+            asignCards.set(pos1, possibleCards.get(i));
+            asignCards.set(pos2, possibleCards.get(i));
             Log.e(TAG, "Carta " + pos1 + " - imagen " + possibleCards.get(i));
             Log.e(TAG, "Carta " + pos2 + " - imagen " + possibleCards.get(i));
         }

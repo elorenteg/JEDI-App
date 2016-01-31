@@ -61,8 +61,8 @@ public class SignupActivity extends AppCompatActivity {
                     editor.putString("key_username", name); // Storing string
                     editor.commit(); // commit changes
 
-                    createUser(name, pass);
-                    loginUser();
+                    createUser(name, pass, email);
+                    loginUser(name);
                 }
             }
         };
@@ -79,8 +79,13 @@ public class SignupActivity extends AppCompatActivity {
         textAlreadyMember.setOnClickListener(lis2);
     }
 
-    private void loginUser() {
+    private void loginUser(String username) {
         Intent intent = new Intent(context, MainActivity.class);
+
+        Bundle bundle = new Bundle();
+        bundle.putString("username", username);
+        intent.putExtras(bundle);
+
         startActivity(intent);
     }
 
@@ -89,11 +94,14 @@ public class SignupActivity extends AppCompatActivity {
         return cursor.moveToFirst();
     }
 
-    private void createUser(String name, String pass) {
+    private void createUser(String name, String pass, String email) {
         ContentValues valuesToStore = new ContentValues();
-        valuesToStore.put("username", name);
-        valuesToStore.put("password", pass);
-        loginHelper.createUser(valuesToStore, "USER");
+        valuesToStore.put(loginHelper.USERNAME, name);
+        valuesToStore.put(loginHelper.PASSWORD, pass);
+        valuesToStore.put(loginHelper.EMAIL, email);
+        valuesToStore.putNull(loginHelper.IMAGE);
+        valuesToStore.putNull(loginHelper.STREET);
+        loginHelper.createUser(valuesToStore, loginHelper.USER_TABLE);
     }
 
     private boolean validateNewUser(String username, String password, String email) {
