@@ -5,12 +5,12 @@
     <item
         android:id="@+id/pizza"
         android:icon="@drawable/pizza"
-        android:title="@string/pizza"
+        android:title="pizza"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/burger"
         android:icon="@drawable/burger"
         app:showAsAction="ifRoom"
-        android:title="@string/burger" />
+        android:title="burger" />
 </menu>

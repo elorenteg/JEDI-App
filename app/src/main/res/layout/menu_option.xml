@@ -5,7 +5,7 @@
     android:clickable="true"
     android:drawableLeft="@drawable/burger"
     android:gravity="center"
-    android:text="@string/burger"
+    android:text="Burger"
 
     android:textColor="?attr/actionMenuTextColor"
     android:textSize="12sp"

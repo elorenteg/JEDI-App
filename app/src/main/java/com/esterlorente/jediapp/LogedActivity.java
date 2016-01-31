@@ -18,9 +18,13 @@ public class LogedActivity extends AppCompatActivity {
     private LoginHelper loginHelper;
 
     private EditText editCalc;
-    private EditText editMemory;
     private Button buttonCalc;
+
+    private EditText editMemory;
     private Button buttonMemory;
+
+    private EditText editWeird;
+    private Button buttonWeird;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +68,23 @@ public class LogedActivity extends AppCompatActivity {
             }
         };
         buttonMemory.setOnClickListener(lis2);
+
+        buttonWeird = (Button) findViewById(R.id.buttonWeird);
+        editWeird = (EditText) findViewById(R.id.editWeird);
+        View.OnClickListener lis3 = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, GameActivity.class);
+                String text = editWeird.getText().toString();
+                if (!text.equals("")) {
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("editNumCards", Integer.valueOf(text));
+                    intent.putExtras(bundle);
+                }
+                startActivity(intent);
+            }
+        };
+        buttonWeird.setOnClickListener(lis3);
     }
 
 }

@@ -34,9 +34,6 @@ public class CalculadoraActivity extends AppCompatActivity implements View.OnCli
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //Intent intent = new Intent(getApplicationContext(), BanderaActivity.class);
-        //startActivity(intent);
-
         textOper = (TextView) findViewById(R.id.text_oper);
         textOper.setText("");
         textRes = (TextView) findViewById(R.id.text_res);

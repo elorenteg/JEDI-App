@@ -5,7 +5,7 @@
     <item
         android:id="@+id/settings"
         android:icon="@drawable/burger"
-        android:title="@string/settings"
+        android:title="@string/action_settings"
         app:showAsAction="always">
         <menu android:checkableBehavior="single">
             <item
@@ -25,14 +25,14 @@
     <item
         android:id="@+id/pizza"
         android:icon="@drawable/pizza"
-        android:title="@string/pizza"
+        android:title="Pizza"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/burger"
         android:icon="@drawable/burger"
         android:orderInCategory="10"
-        android:title="@string/burger"
+        android:title="Burger"
         app:showAsAction="always|withText" />
 
 </menu>

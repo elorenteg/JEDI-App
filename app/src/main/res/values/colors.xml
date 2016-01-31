@@ -7,4 +7,8 @@
     <color name="white">#FFFFFF</color>
     <color name="grayBlue">#c1333b50</color>
     <color name="grayBlueDark">#ea262e3b</color>
+
+    <color name="greenPrimary">#5EB287</color>
+    <color name="greenPrimaryDark">#3F775A</color>
+    <color name="greenAccent">#f92c9574</color>
 </resources>

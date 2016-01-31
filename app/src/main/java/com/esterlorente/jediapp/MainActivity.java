@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Context context;
     private LoginHelper loginHelper;
+
+    private String username = null;
 
     private EditText editName;
     private EditText editPass;
@@ -42,50 +45,62 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         context = getApplicationContext();
-        loginHelper = new LoginHelper(context);
 
+        if (username == null) {
+            // No hay usuario logeado
+            loginHelper = new LoginHelper(context);
 
-        buttonInsert = (Button) findViewById(R.id.buttonInsert);
-        buttonLogin = (Button) findViewById(R.id.buttonLogin);
-        editName = (EditText) findViewById(R.id.editName);
-        editPass = (EditText) findViewById(R.id.editPass);
-        View.OnClickListener lis3 = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, MemoryActivity.class);
-                String name = editName.getText().toString();
-                String pass = editPass.getText().toString();
+            buttonInsert = (Button) findViewById(R.id.buttonInsert);
+            buttonLogin = (Button) findViewById(R.id.buttonLogin);
+            editName = (EditText) findViewById(R.id.editName);
+            editPass = (EditText) findViewById(R.id.editPass);
+            View.OnClickListener lis3 = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, MemoryActivity.class);
+                    String name = editName.getText().toString();
+                    String pass = editPass.getText().toString();
 
-                if (!userExists(name)) {
-                    Toast.makeText(context, "Nuevo usuario: " + name + " + " + pass, Toast.LENGTH_SHORT).show();
-                    createUser(name, pass);
-                } else {
-                    Toast.makeText(context, "Usuario ya existe con ese username", Toast.LENGTH_SHORT).show();
+                    if (!userExists(name)) {
+                        Toast.makeText(context, "Nuevo usuario: " + name + " + " + pass, Toast.LENGTH_SHORT).show();
+                        createUser(name, pass);
+                    } else {
+                        Toast.makeText(context, "Usuario ya existe con ese username", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        };
-        buttonInsert.setOnClickListener(lis3);
+            };
+            buttonInsert.setOnClickListener(lis3);
 
-        View.OnClickListener lis4 = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, MemoryActivity.class);
-                String name = editName.getText().toString();
-                String pass = editPass.getText().toString();
+            View.OnClickListener lis4 = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, MemoryActivity.class);
+                    String name = editName.getText().toString();
+                    String pass = editPass.getText().toString();
 
-                if (userCorrect(name, pass)) {
-                    Toast.makeText(context, "Login correcto!", Toast.LENGTH_SHORT).show();
-                    intent = new Intent(context, LogedActivity.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("username", name);
-                    intent.putExtras(bundle);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(context, "Usuario incorrecto", Toast.LENGTH_SHORT).show();
+                    if (userCorrect(name, pass)) {
+                        Toast.makeText(context, "Login correcto!", Toast.LENGTH_SHORT).show();
+                        username = name;
+
+                        loginUser();
+                    } else {
+                        Toast.makeText(context, "Usuario incorrecto", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        };
-        buttonLogin.setOnClickListener(lis4);
+            };
+            buttonLogin.setOnClickListener(lis4);
+        } else {
+            // Usuario ya se habia logeado
+            loginUser();
+        }
+    }
+
+    private void loginUser() {
+        Intent intent = new Intent(context, LogedActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("username", username);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
     @Override
@@ -123,5 +138,21 @@ public class MainActivity extends AppCompatActivity {
         valuesToStore.put("username", name);
         valuesToStore.put("password", pass);
         loginHelper.createUser(valuesToStore, "USER");
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outstate) {
+        super.onSaveInstanceState(outstate);
+
+        outstate.putString("username", username);
+        Log.v(TAG, "Guardando username: " + username);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        username = (savedInstanceState.getString("username"));
+        Log.v(TAG, "Restableciendo username: " + savedInstanceState.getString("username"));
     }
 }
