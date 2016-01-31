@@ -58,8 +58,8 @@ public class GameActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new MemoryFragment(), "@string/memoryTabname");
-        adapter.addFragment(new RanquingFragment(), "@string/ranquingTabname");
+        adapter.addFragment(new MemoryFragment(), getResources().getText(R.string.memoryTabname).toString());
+        adapter.addFragment(new RanquingFragment(), getResources().getText(R.string.ranquingTabname).toString());
         viewPager.setAdapter(adapter);
     }
 

@@ -1,44 +1,35 @@
 package com.esterlorente.jediapp;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.esterlorente.jediapp.data.LoginHelper;
 
 public class MainActivity extends AppCompatActivity {
-    private String TAG = "MAIN_ACTIVITY";
+    private String TAG = "LOGED_ACTIVITY";
 
     private Context context;
     private LoginHelper loginHelper;
 
-    private String username = null;
+    private EditText editCalc;
+    private Button buttonCalc;
 
-    private EditText editName;
-    private EditText editPass;
-    private Button buttonInsert;
-    private Button buttonLogin;
+    private EditText editMemory;
+    private Button buttonMemory;
+
+    private EditText editWeird;
+    private Button buttonWeird;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        if (getIntent().getBooleanExtra("Exit me", false)) {
-            finish();
-            return; // add this to prevent from doing unnecessary stuffs
-        }
 
         // Anadir Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -46,113 +37,54 @@ public class MainActivity extends AppCompatActivity {
 
         context = getApplicationContext();
 
-        if (username == null) {
-            // No hay usuario logeado
-            loginHelper = new LoginHelper(context);
+        buttonCalc = (Button) findViewById(R.id.buttonCalc);
+        editCalc = (EditText) findViewById(R.id.editCalc);
+        View.OnClickListener lis = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, CalculadoraActivity.class);
+                Bundle bundle = new Bundle();
+                String text = editCalc.getText().toString();
+                bundle.putString("editTextOper", text);
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        };
+        buttonCalc.setOnClickListener(lis);
 
-            buttonInsert = (Button) findViewById(R.id.buttonInsert);
-            buttonLogin = (Button) findViewById(R.id.buttonLogin);
-            editName = (EditText) findViewById(R.id.editName);
-            editPass = (EditText) findViewById(R.id.editPass);
-            View.OnClickListener lis3 = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(context, MemoryActivity.class);
-                    String name = editName.getText().toString();
-                    String pass = editPass.getText().toString();
-
-                    if (!userExists(name)) {
-                        Toast.makeText(context, "Nuevo usuario: " + name + " + " + pass, Toast.LENGTH_SHORT).show();
-                        createUser(name, pass);
-                    } else {
-                        Toast.makeText(context, "Usuario ya existe con ese username", Toast.LENGTH_SHORT).show();
-                    }
+        buttonMemory = (Button) findViewById(R.id.buttonMemory);
+        editMemory = (EditText) findViewById(R.id.editMemory);
+        View.OnClickListener lis2 = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, MemoryActivity.class);
+                String text = editMemory.getText().toString();
+                if (!text.equals("")) {
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("editNumCards", Integer.valueOf(text));
+                    intent.putExtras(bundle);
                 }
-            };
-            buttonInsert.setOnClickListener(lis3);
+                startActivity(intent);
+            }
+        };
+        buttonMemory.setOnClickListener(lis2);
 
-            View.OnClickListener lis4 = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(context, MemoryActivity.class);
-                    String name = editName.getText().toString();
-                    String pass = editPass.getText().toString();
-
-                    if (userCorrect(name, pass)) {
-                        Toast.makeText(context, "Login correcto!", Toast.LENGTH_SHORT).show();
-                        username = name;
-
-                        loginUser();
-                    } else {
-                        Toast.makeText(context, "Usuario incorrecto", Toast.LENGTH_SHORT).show();
-                    }
+        buttonWeird = (Button) findViewById(R.id.buttonWeird);
+        editWeird = (EditText) findViewById(R.id.editWeird);
+        View.OnClickListener lis3 = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, GameActivity.class);
+                String text = editWeird.getText().toString();
+                if (!text.equals("")) {
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("editNumCards", Integer.valueOf(text));
+                    intent.putExtras(bundle);
                 }
-            };
-            buttonLogin.setOnClickListener(lis4);
-        } else {
-            // Usuario ya se habia logeado
-            loginUser();
-        }
+                startActivity(intent);
+            }
+        };
+        buttonWeird.setOnClickListener(lis3);
     }
 
-    private void loginUser() {
-        Intent intent = new Intent(context, LogedActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("username", username);
-        intent.putExtras(bundle);
-        startActivity(intent);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.simple_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private boolean userExists(String name) {
-        Cursor cursor = loginHelper.getUserByName(name);
-        return cursor.moveToFirst();
-    }
-
-    private boolean userCorrect(String name, String pass) {
-        Cursor cursor = loginHelper.getUserByName(name);
-        if (cursor.moveToFirst()) {
-            // User exists
-            String passSaved = cursor.getString(cursor.getColumnIndex("password"));
-            return pass.equals(passSaved);
-        }
-        return false;
-    }
-
-    private void createUser(String name, String pass) {
-        ContentValues valuesToStore = new ContentValues();
-        valuesToStore.put("username", name);
-        valuesToStore.put("password", pass);
-        loginHelper.createUser(valuesToStore, "USER");
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outstate) {
-        super.onSaveInstanceState(outstate);
-
-        outstate.putString("username", username);
-        Log.v(TAG, "Guardando username: " + username);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-
-        username = (savedInstanceState.getString("username"));
-        Log.v(TAG, "Restableciendo username: " + savedInstanceState.getString("username"));
-    }
 }

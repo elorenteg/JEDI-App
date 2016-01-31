@@ -4,28 +4,36 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/icon200"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/GreenAppTheme">
-        <activity android:name=".MainActivity">
+        android:theme="@style/AppTheme">
+        <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CalculadoraActivity" />
+        <activity
+            android:name=".SignupActivity"
+            android:label="@string/title_activity_signup" />
+
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/title_activity_loged" />
+
+        <activity
+            android:name=".CalculadoraActivity"
+            android:label="@string/title_activity_calculadora" />
+
         <activity
             android:name=".MemoryActivity"
             android:label="@string/title_activity_memory" />
-        <activity
-            android:name=".LogedActivity"
-            android:label="@string/title_activity_loged"
-            android:theme="@style/AppTheme" />
+
         <activity
             android:name=".GameActivity"
-            android:label="@string/title_activity_game"></activity>
+            android:label="@string/title_activity_game" />
     </application>
 
 </manifest>

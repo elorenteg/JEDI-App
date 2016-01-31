@@ -65,14 +65,14 @@ public class CalculadoraActivity extends AppCompatActivity implements View.OnCli
                 Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:934137660"));
                 startActivity(intent);
                 /*
-                Intent intent = new Intent(this, MainActivity.class);
+                Intent intent = new Intent(this, LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // this will clear all the stack
                 intent.putExtra("Exit me", true);
                 startActivity(intent);
                 finish();
                 */
                 /*
-                Intent i = new Intent(this, MainActivity.class);
+                Intent i = new Intent(this, LoginActivity.class);
                 // set the new task and clear flags
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(i);

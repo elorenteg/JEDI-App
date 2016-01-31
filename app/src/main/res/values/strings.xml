@@ -5,6 +5,13 @@
     <string name="exit">Exit</string>
 
     <string name="title_activity_loged">LogedActivity</string>
+    <string name="username">USERNAME</string>
+    <string name="password">PASSWORD</string>
+    <string name="email">EMAIL</string>
+    <string name="login">Login</string>
+    <string name="create_account">Create account</string>
+    <string name="no_account">No account yet? Create one</string>
+    <string name="already_member">Already a member? Login</string>
 
     <string name="title_activity_game">GameActivity</string>
     <string name="memoryTabname">Memory</string>
@@ -12,7 +19,8 @@
     <string name="intents">Num. attempts</string>
     <string name="restart">Restart</string>
 
-
     <string name="title_activity_memory">MemoryActivity</string>
+    <string name="title_activity_signup">SignupActivity</string>
+    <string name="title_activity_calculadora">CalculadoraActivity</string>
 
 </resources>
