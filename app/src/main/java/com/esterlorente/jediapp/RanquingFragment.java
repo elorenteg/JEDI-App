@@ -8,15 +8,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.esterlorente.jediapp.data.LoginHelper;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
@@ -30,7 +27,7 @@ public class RanquingFragment extends Fragment {
     private LinearLayoutManager mLinearLayout;
     private MyCustomAdapter adapter;
 
-    private int numCard = 4;
+    private int numCards = 4;
 
     public RanquingFragment() {
     }
@@ -48,24 +45,6 @@ public class RanquingFragment extends Fragment {
         loginHelper = new LoginHelper(context);
         setHasOptionsMenu(true);
 
-        //findViewById del layout activity_main
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
-
-        //LinearLayoutManager necesita el contexto de la Activity.
-        //El LayoutManager se encarga de posicionar los items dentro del recyclerview
-        //Y de definir la politica de reciclaje de los items no visibles.
-        mLinearLayout = new LinearLayoutManager(context);
-
-        //Asignamos el LinearLayoutManager al recycler:
-        mRecyclerView.setLayoutManager(mLinearLayout);
-
-        //El adapter se encarga de  adaptar un objeto definido en el c�digo a una vista en xml
-        //seg�n la estructura definida.
-        //Asignamos nuestro custom Adapter
-        ArrayList<Score> scores = getScoresByCard(numCard);
-         adapter = new MyCustomAdapter(scores);
-        mRecyclerView.setAdapter(adapter);
-
         return rootView;
     }
 
@@ -79,7 +58,7 @@ public class RanquingFragment extends Fragment {
                 int score = cursor.getInt(cursor.getColumnIndex(loginHelper.SCORE));
                 Score scoreOBJ = new Score(username, score);
                 scores.add(scoreOBJ);
-            } while(cursor.moveToNext());
+            } while (cursor.moveToNext());
         }
 
         Log.e(TAG, "Scores " + scores.size());
@@ -127,4 +106,47 @@ public class RanquingFragment extends Fragment {
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outstate) {
+        super.onSaveInstanceState(outstate);
+
+        Log.e(TAG, "Guardando datos");
+
+        outstate.putInt("numCards", numCards);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            Log.e(TAG, "Restaurando datos");
+
+            numCards = savedInstanceState.getInt("numCards");
+        }
+        initRanquing();
+    }
+
+    private void initRanquing() {
+        //findViewById del layout activity_main
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
+
+        //LinearLayoutManager necesita el contexto de la Activity.
+        //El LayoutManager se encarga de posicionar los items dentro del recyclerview
+        //Y de definir la politica de reciclaje de los items no visibles.
+        mLinearLayout = new LinearLayoutManager(context);
+
+        //Asignamos el LinearLayoutManager al recycler:
+        mRecyclerView.setLayoutManager(mLinearLayout);
+
+        //El adapter se encarga de  adaptar un objeto definido en el c�digo a una vista en xml
+        //seg�n la estructura definida.
+        //Asignamos nuestro custom Adapter
+        ArrayList<Score> scores = getScoresByCard(numCards);
+        adapter = new MyCustomAdapter(scores);
+        mRecyclerView.setAdapter(adapter);
+    }
+
+
 }

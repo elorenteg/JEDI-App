@@ -15,7 +15,6 @@ public class MyCustomAdapter extends RecyclerView.Adapter<MyCustomAdapter.Adapte
     ArrayList<Score> scores;
 
     MyCustomAdapter(ArrayList<Score> scores) {
-        Log.e("TAG", "MyCustomAdapter");
         this.scores = scores;
     }
 
@@ -27,7 +26,6 @@ public class MyCustomAdapter extends RecyclerView.Adapter<MyCustomAdapter.Adapte
 
     @Override
     public MyCustomAdapter.AdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        Log.e("TAG", "onCreateViewHolder");
         //Instancia un layout XML en la correspondiente vista.
         LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
         //Inflamos en la vista el layout para cada elemento
@@ -37,7 +35,6 @@ public class MyCustomAdapter extends RecyclerView.Adapter<MyCustomAdapter.Adapte
 
     @Override
     public void onBindViewHolder(MyCustomAdapter.AdapterViewHolder adapterViewholder, int position) {
-        Log.e("TAG", "onBindViewHolder " + adapterViewholder.username.getText());
         //Dependiendo del entero se asignará una imagen u otra
         adapterViewholder.username.setText(scores.get(position).getUsername());
         adapterViewholder.score.setText(String.valueOf(scores.get(position).getScore()));
@@ -45,7 +42,6 @@ public class MyCustomAdapter extends RecyclerView.Adapter<MyCustomAdapter.Adapte
 
     @Override
     public int getItemCount() {
-        Log.e("TAG", "getItemCount " + scores.size());
         //Debemos retornar el tamaño de todos los elementos contenidos en el viewholder
         //Por defecto es return 0 --> No se mostrará nada.
         return scores.size();

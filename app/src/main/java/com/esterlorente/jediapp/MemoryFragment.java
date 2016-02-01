@@ -2,11 +2,13 @@ package com.esterlorente.jediapp;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -16,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.esterlorente.jediapp.data.LoginHelper;
 
@@ -38,7 +41,7 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
     private ArrayList<Integer> idsCards;
     private ArrayList<CardMemory> listCards;
     private Integer selCard;
-    private int numPairsLeft = numCards * numCards / 2;
+    private int numPairsLeft;
 
     public MemoryFragment() {
     }
@@ -77,14 +80,19 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
     }
 
     private void drawCards(int width, int height) {
-        LinearLayout linearLayout = (LinearLayout) rootView.findViewById(R.id.layoutCards);
         boolean initialize = listCards == null;
+        LinearLayout linearLayout = (LinearLayout) rootView.findViewById(R.id.layoutCards);
         if (initialize) {
+            linearLayout.removeAllViews();
             idsCards = new ArrayList();
             listCards = new ArrayList();
             selCard = -1;
         }
         int id = 0;
+        int paddingLeft = 10;
+        int paddingRight = 10;
+        int paddingTop = 10;
+        int paddingBottom = 10;
 
         for (int i = 0; i < numCards; ++i) {
             LinearLayout rowLayout = new LinearLayout(context);
@@ -114,11 +122,12 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
                     card.setId(idsCards.get(i * numCards + j));
                 }
 
-                int w = width / numCards;
-                int h = height / numCards;
+                int w = (width - numCards * (paddingLeft + paddingRight)) / numCards;
+                int h = (height - numCards * (paddingTop + paddingBottom)) / numCards;
                 if (h > 1.3 * w) h = (int) 1.3f * w;
                 else if (h < 1.3 * w) w = Integer.valueOf(Math.round(h / 1.3f));
                 LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(w, h);
+                parms.setMargins(paddingLeft, paddingTop, paddingRight, paddingBottom);
                 card.setLayoutParams(parms);
                 card.setOnClickListener(this);
                 cardMemory.setCard(card);
@@ -143,17 +152,11 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
             int rand1 = randIds.get(i * 2);
             int rand2 = randIds.get(i * 2 + 1);
 
-            //int pos1 = idsCards.indexOf(rand1);
-            //int pos2 = idsCards.indexOf(rand2);
-
             CardMemory card1 = listCards.get(idsCards.indexOf(rand1));
             CardMemory card2 = listCards.get(idsCards.indexOf(rand2));
 
             card1.setAsignCard(possibleCards.get(i));
             card2.setAsignCard(possibleCards.get(i));
-
-            //listCards.set(pos1, card1);
-            //listCards.set(pos2, card2);
         }
     }
 
@@ -163,26 +166,24 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         int pos = idsCards.indexOf(id);
 
         CardMemory cardMemory = listCards.get(pos);
-        //Log.e(TAG, "Click en carta " + id);
 
         switch (cardMemory.getStateCard()) {
             case R.drawable.cover:
                 cardMemory.setStateCard(cardMemory.getAsignCard());
-                //Log.e(TAG, "Carta " + pos + " - imagen " + cardMemory.getStateCard());
 
                 flipCard(cardMemory, cardMemory.getStateCard(), 0);
-                //listCards.set(pos, cardMemory);
 
                 if (selCard != -1) {
                     // hay dos cartas bocarriba
+                    int score = Integer.parseInt(textAttempts.getText().toString()) + 1;
+                    textAttempts.setText(Integer.toString(score));
+
                     if (cardMemory.getStateCard() == listCards.get(selCard).getStateCard()) {
                         // son pareja, eliminarlas a los 2s
                         Log.e(TAG, "Pareja!");
                         deleteCards(cardMemory, listCards.get(selCard), 2000);
 
                         numPairsLeft = numPairsLeft - 1;
-                        int score = Integer.parseInt(textAttempts.getText().toString()) + 1;
-                        textAttempts.setText(Integer.toString(score));
 
                         if (numPairsLeft == 0) {
                             Log.e(TAG, "Final del juego!!");
@@ -206,16 +207,13 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
                                 Log.e(TAG, "Primera marca! :D");
                                 createScore(username, numCards, score);
                             }
+                            showEndGame();
                         }
                     } else {
                         // no son pareja, voltearlas
                         Log.e(TAG, "No son pareja :(");
                         flipCard(cardMemory, R.drawable.cover, 2000);
                         flipCard(listCards.get(selCard), R.drawable.cover, 2000);
-
-                        //cardMemory.setStateCard(R.drawable.cover);
-                        //listCards.get(selCard).setStateCard(R.drawable.cover);
-                        textAttempts.setText(Integer.toString(Integer.parseInt(textAttempts.getText().toString()) + 1));
                     }
 
                     selCard = -1;
@@ -223,12 +221,26 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
                     // es la primera carta bocarriba
                     selCard = pos;
                 }
-
                 break;
             default:
                 Log.e(TAG, "No deberia pasar");
                 break;
         }
+    }
+
+    private void showEndGame() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context)
+                .setTitle(R.string.complete)//.setIcon(R.drawable.icon)
+                .setMessage(R.string.alert_mss + " " + textAttempts.getText())
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Toast.makeText(context, "POS enter a text here", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setCancelable(false);
+
+        alertDialog.create();
+        alertDialog.show();
     }
 
     private void createScore(String username, int numCards, int score) {
@@ -270,6 +282,7 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
 
         Log.e(TAG, "Guardando datos");
 
+        outstate.putInt("numCards", numCards);
         outstate.putIntegerArrayList("idsCards", idsCards);
         outstate.putParcelableArrayList("listCards", listCards);
         outstate.putInt("selCard", selCard);
@@ -284,6 +297,7 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         if (savedInstanceState != null) {
             Log.e(TAG, "Restaurando datos");
 
+            numCards = savedInstanceState.getInt("numCards");
             idsCards = (ArrayList) savedInstanceState.getIntegerArrayList("idsCards");
             listCards = (ArrayList) savedInstanceState.getParcelableArrayList("listCards");
             selCard = savedInstanceState.getInt("selCard");
@@ -301,13 +315,6 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    /*
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_memory, menu);
-    }
-    */
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -319,34 +326,33 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
                 return true;
             case R.id.num2:
                 Log.e(TAG, "memory");
-                numCards = 2;
-                listCards = null;
-                initCards();
+                restartMemory(2);
                 return true;
             case R.id.num4:
                 Log.e(TAG, "memory");
-                numCards = 4;
-                listCards = null;
-                initCards();
+                restartMemory(4);
                 return true;
             case R.id.num6:
                 Log.e(TAG, "memory");
-                numCards = 6;
-                listCards = null;
-                initCards();
+                restartMemory(6);
                 return true;
             case R.id.num8:
                 Log.e(TAG, "memory");
-                numCards = 8;
-                listCards = null;
-                initCards();
+                restartMemory(8);
                 return true;
             case R.id.restart:
-                listCards = null;
-                initCards();
+                restartMemory(numCards);
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void restartMemory(int numCards) {
+        this.numCards = numCards;
+        numPairsLeft = numCards * numCards / 2;
+        textAttempts.setText("0");
+        listCards = null;
+        initCards();
     }
 }
