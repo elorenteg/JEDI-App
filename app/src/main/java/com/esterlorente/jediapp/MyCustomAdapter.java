@@ -19,6 +19,11 @@ public class MyCustomAdapter extends RecyclerView.Adapter<MyCustomAdapter.Adapte
         this.scores = scores;
     }
 
+    public void changeData(ArrayList<Score> scores) {
+        this.scores = scores;
+        this.notifyDataSetChanged();
+    }
+
 
     @Override
     public MyCustomAdapter.AdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {

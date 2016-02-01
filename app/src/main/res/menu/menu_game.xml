@@ -8,6 +8,9 @@
         android:title="@string/numCards">
         <menu android:checkableBehavior="single">
             <item
+                android:id="@+id/num2"
+                android:title="2 cards" />
+            <item
                 android:id="@+id/num4"
                 android:title="4 cards" />
             <item

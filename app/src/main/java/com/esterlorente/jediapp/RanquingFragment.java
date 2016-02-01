@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 
 import com.esterlorente.jediapp.data.LoginHelper;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
@@ -27,6 +28,7 @@ public class RanquingFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLinearLayout;
+    private MyCustomAdapter adapter;
 
     private int numCard = 4;
 
@@ -44,6 +46,7 @@ public class RanquingFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_ranquing, container, false);
         context = getActivity();
         loginHelper = new LoginHelper(context);
+        setHasOptionsMenu(true);
 
         //findViewById del layout activity_main
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
@@ -60,7 +63,8 @@ public class RanquingFragment extends Fragment {
         //seg�n la estructura definida.
         //Asignamos nuestro custom Adapter
         ArrayList<Score> scores = getScoresByCard(numCard);
-        mRecyclerView.setAdapter(new MyCustomAdapter(scores));
+         adapter = new MyCustomAdapter(scores);
+        mRecyclerView.setAdapter(adapter);
 
         return rootView;
     }
@@ -83,21 +87,41 @@ public class RanquingFragment extends Fragment {
         return scores;
     }
 
+    /*
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_ranquing, menu);
     }
+    */
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        ArrayList<Score> scores;
 
         switch (id) {
             case R.id.action_settings:
-                Log.e(TAG, "adios");
+                Log.e(TAG, "ranquing");
+                return true;
+            case R.id.num2:
+                Log.e(TAG, "ranquing");
+                scores = getScoresByCard(2);
+                adapter.changeData(scores);
                 return true;
             case R.id.num4:
-                Log.e(TAG, "adios");
+                Log.e(TAG, "ranquing");
+                scores = getScoresByCard(4);
+                adapter.changeData(scores);
+                return true;
+            case R.id.num6:
+                Log.e(TAG, "ranquing");
+                scores = getScoresByCard(6);
+                adapter.changeData(scores);
+                return true;
+            case R.id.num8:
+                Log.e(TAG, "ranquing");
+                scores = getScoresByCard(8);
+                adapter.changeData(scores);
                 return true;
         }
 

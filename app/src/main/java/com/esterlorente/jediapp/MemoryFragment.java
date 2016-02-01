@@ -311,13 +311,39 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        ArrayList<Score> scores;
 
         switch (id) {
             case R.id.action_settings:
-                Log.e(TAG, "hola");
+                Log.e(TAG, "memory");
+                return true;
+            case R.id.num2:
+                Log.e(TAG, "memory");
+                numCards = 2;
+                listCards = null;
+                initCards();
                 return true;
             case R.id.num4:
-                Log.e(TAG, "hola");
+                Log.e(TAG, "memory");
+                numCards = 4;
+                listCards = null;
+                initCards();
+                return true;
+            case R.id.num6:
+                Log.e(TAG, "memory");
+                numCards = 6;
+                listCards = null;
+                initCards();
+                return true;
+            case R.id.num8:
+                Log.e(TAG, "memory");
+                numCards = 8;
+                listCards = null;
+                initCards();
+                return true;
+            case R.id.restart:
+                listCards = null;
+                initCards();
                 return true;
         }
 
