@@ -60,38 +60,6 @@
         android:orientation="horizontal">
 
         <EditText
-            android:id="@+id/editMemory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="1"
-            android:inputType="number" />
-
-        <Button
-            android:id="@+id/buttonMemory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textView"
-            android:layout_centerHorizontal="true"
-            android:layout_weight="3"
-            android:text="Jugar" />
-
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Activity &amp; 2Fragments"
-        android:textSize="20dp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:orientation="horizontal">
-
-        <EditText
             android:id="@+id/editWeird"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -108,5 +76,12 @@
             android:layout_weight="3"
             android:text="Ver" />
     </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Logout"
+        android:id="@+id/buttonLogout"
+        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>

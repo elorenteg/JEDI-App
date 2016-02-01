@@ -2,6 +2,7 @@ package com.esterlorente.jediapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -36,11 +37,10 @@ public class MainActivity extends AppCompatActivity {
     private EditText editCalc;
     private Button buttonCalc;
 
-    private EditText editMemory;
-    private Button buttonMemory;
-
     private EditText editWeird;
     private Button buttonWeird;
+
+    private Button buttonLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,23 +78,6 @@ public class MainActivity extends AppCompatActivity {
         };
         buttonCalc.setOnClickListener(lis);
 
-        buttonMemory = (Button) findViewById(R.id.buttonMemory);
-        editMemory = (EditText) findViewById(R.id.editMemory);
-        View.OnClickListener lis2 = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, MemoryActivity.class);
-                String text = editMemory.getText().toString();
-                if (!text.equals("")) {
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("editNumCards", Integer.valueOf(text));
-                    intent.putExtras(bundle);
-                }
-                startActivity(intent);
-            }
-        };
-        buttonMemory.setOnClickListener(lis2);
-
         buttonWeird = (Button) findViewById(R.id.buttonWeird);
         editWeird = (EditText) findViewById(R.id.editWeird);
         View.OnClickListener lis3 = new View.OnClickListener() {
@@ -111,6 +94,21 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         buttonWeird.setOnClickListener(lis3);
+
+        buttonLogout = (Button) findViewById(R.id.buttonLogout);
+        View.OnClickListener lis4 = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = pref.edit();
+                editor.remove("key_username");
+                editor.commit();
+
+                Intent intent = new Intent(context, LoginActivity.class);
+                startActivity(intent);
+            }
+        };
+        buttonLogout.setOnClickListener(lis4);
     }
 
     private void initNavigationDrawer() {

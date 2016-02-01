@@ -9,13 +9,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class LoginHelper extends SQLiteOpenHelper {
 
     // Declaracion del nombre de la base de datos
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 5;
 
     // Declaracion global de la version de la base de datos
     public static final String DATABASE_NAME = "USER_DB";
 
     // Declaracion del nombre de la tabla
     public static final String USER_TABLE = "USER";
+    public static final String SCORE_TABLE = "SCORE_TB";
 
     // Declaracion de las columnas de la tabla
     public static final String USERNAME = "username";
@@ -23,6 +24,8 @@ public class LoginHelper extends SQLiteOpenHelper {
     public static final String EMAIL = "email";
     public static final String IMAGE = "image";
     public static final String STREET = "street";
+    public static final String SCORE = "score";
+    public static final String NUMCARDS = "numcards";
 
     // sentencia global de cracion de la base de datos
     public static final String USER_TABLE_CREATE = "CREATE TABLE " + USER_TABLE + " (" +
@@ -32,6 +35,11 @@ public class LoginHelper extends SQLiteOpenHelper {
             IMAGE + " BLOB, " +
             STREET + " TEXT );";
 
+    public static final String SCORE_TABLE_CREATE = "CREATE TABLE " + SCORE_TABLE + " (" +
+            USERNAME + " TEXT PRIMARY KEY UNIQUE, " +
+            SCORE + " INT, " +
+            NUMCARDS + " INT);";
+
 
     public LoginHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -40,21 +48,7 @@ public class LoginHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(USER_TABLE_CREATE);
-    }
-
-    public Cursor getAllUsers() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        String[] columns = {USERNAME, PASSWORD};
-        Cursor c = db.query(
-                USER_TABLE,                             // The table to query
-                columns,                                // The columns to return
-                null,                                   // The columns for the WHERE clause
-                null,                                   // The values for the WHERE clause
-                null,                                   // don't group the rows
-                null,                                   // don't filter by row groups
-                null                                    // The sort order
-        );
-        return c;
+        db.execSQL(SCORE_TABLE_CREATE);
     }
 
     public Cursor getUserByName(String username) {
@@ -89,16 +83,50 @@ public class LoginHelper extends SQLiteOpenHelper {
         return c;
     }
 
-    public void createUser(ContentValues values, String tableName) {
+    public void createUser(ContentValues values) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.insert(
-                tableName,
+                USER_TABLE,
                 null,
                 values);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
+    }
 
+    public Cursor getUserScoreByName(String username, int numCards) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String[] columns = {SCORE};
+        String[] where = {username, Integer.toString(numCards)};
+        Cursor c = db.query(
+                SCORE_TABLE,                            // The table to query
+                columns,                                // The columns to return
+                USERNAME + "=? AND " + NUMCARDS + "=?", // The columns for the WHERE clause
+                where,                                  // The values for the WHERE clause
+                null,                                   // don't group the rows
+                null,                                   // don't filter by row groups
+                null                                    // The sort order
+        );
+        return c;
+    }
+
+    public void updateScoreByName(ContentValues values, String username, int numCards) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String[] where = {username, Integer.toString(numCards)};
+        db.update(
+                SCORE_TABLE,                            // The table to query
+                values,                                 // The new column values
+                USERNAME + "=? AND " + NUMCARDS + "=?", // The columns for the WHERE clause
+                where                                   // The values for the WHERE clause
+        );
+    }
+
+    public void createScore(ContentValues values) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.insert(
+                SCORE_TABLE,
+                null,
+                values);
     }
 }

@@ -28,10 +28,6 @@
             android:label="@string/title_activity_calculadora" />
 
         <activity
-            android:name=".MemoryActivity"
-            android:label="@string/title_activity_memory" />
-
-        <activity
             android:name=".GameActivity"
             android:label="@string/title_activity_game" />
     </application>

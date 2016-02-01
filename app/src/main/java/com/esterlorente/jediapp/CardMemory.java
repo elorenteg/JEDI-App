@@ -1,5 +1,10 @@
 package com.esterlorente.jediapp;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.ObjectAnimator;
+import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.widget.ImageView;
@@ -39,6 +44,35 @@ public class CardMemory implements Parcelable {
 
     public void setStateCard(int stateCard) {
         this.stateCard = stateCard;
+    }
+
+    public void flipCard(final Context context, final Drawable newImage) {
+        ObjectAnimator animCardStart = (ObjectAnimator) AnimatorInflater.loadAnimator(
+                context, R.animator.memory_cardflip);
+        animCardStart.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                ObjectAnimator animCardEnd = (ObjectAnimator) AnimatorInflater.loadAnimator(
+                        context, R.animator.memory_cardflipend);
+                card.setImageDrawable(newImage);
+                animCardEnd.setTarget(card);
+                animCardEnd.start();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+            }
+        });
+        animCardStart.setTarget(card);
+        animCardStart.start();
     }
 
     @Override

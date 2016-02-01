@@ -101,7 +101,7 @@ public class SignupActivity extends AppCompatActivity {
         valuesToStore.put(loginHelper.EMAIL, email);
         valuesToStore.putNull(loginHelper.IMAGE);
         valuesToStore.putNull(loginHelper.STREET);
-        loginHelper.createUser(valuesToStore, loginHelper.USER_TABLE);
+        loginHelper.createUser(valuesToStore);
     }
 
     private boolean validateNewUser(String username, String password, String email) {

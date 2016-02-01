@@ -1,7 +1,12 @@
 package com.esterlorente.jediapp;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
@@ -10,8 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
-import com.example.material.joanbarroso.flipper.CoolImageFlipper;
+import com.esterlorente.jediapp.data.LoginHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,12 +30,15 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
     private String TAG = "MEMORY_FRAGMENT";
     private Context context;
     private View rootView;
+    private LoginHelper loginHelper;
 
-    private int numCards = 4;
-    ArrayList<Integer> idsCards;
+    private TextView textAttempts;
+
+    private int numCards = 2;
+    private ArrayList<Integer> idsCards;
     private ArrayList<CardMemory> listCards;
-
-    CoolImageFlipper coolImageFlipper;
+    private Integer selCard;
+    private int numPairsLeft = numCards * numCards / 2;
 
     public MemoryFragment() {
     }
@@ -46,7 +55,7 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         rootView = inflater.inflate(R.layout.fragment_memory, container, false);
 
         context = getContext();
-        coolImageFlipper = new CoolImageFlipper(context);
+        textAttempts = (TextView) rootView.findViewById(R.id.textAttempt);
 
         return rootView;
     }
@@ -71,6 +80,7 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         if (initialize) {
             idsCards = new ArrayList();
             listCards = new ArrayList();
+            selCard = -1;
         }
         int id = 0;
 
@@ -151,26 +161,106 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         int pos = idsCards.indexOf(id);
 
         CardMemory cardMemory = listCards.get(pos);
-        Log.e(TAG, "Click en carta " + id);
+        //Log.e(TAG, "Click en carta " + id);
 
         switch (cardMemory.getStateCard()) {
             case R.drawable.cover:
                 cardMemory.setStateCard(cardMemory.getAsignCard());
+                //Log.e(TAG, "Carta " + pos + " - imagen " + cardMemory.getStateCard());
+
+                flipCard(cardMemory, context.getDrawable(cardMemory.getStateCard()), 0);
                 listCards.set(pos, cardMemory);
 
-                Log.e(TAG, "Carta " + pos + " - imagen " + cardMemory.getStateCard());
+                if (selCard != -1) {
+                    // hay dos cartas bocarriba
+                    if (cardMemory.getStateCard() == listCards.get(selCard).getStateCard()) {
+                        // son pareja, eliminarlas a los 2s
+                        Log.e(TAG, "Pareja!");
+                        deleteCard(cardMemory, 2000);
+                        deleteCard(listCards.get(selCard), 2000);
 
-                coolImageFlipper.flipImage(context.getDrawable(cardMemory.getStateCard()), cardMemory.getCard());
+                        listCards.get(pos).setStateCard(0);
+                        listCards.get(selCard).setStateCard(0);
+
+                        numPairsLeft = numPairsLeft - 1;
+                        textAttempts.setText(Integer.toString(Integer.parseInt(textAttempts.getText().toString()) + 1));
+
+                        if (numPairsLeft == 0) {
+                            Log.e(TAG, "Final del juego!!");
+                            int score = Integer.parseInt(textAttempts.getText().toString());
+
+                            SharedPreferences pref = context.getSharedPreferences("MyPref", Context.MODE_PRIVATE);
+                            final SharedPreferences.Editor editor = pref.edit();
+                            String username = pref.getString("key_username", null);
+
+                            loginHelper = new LoginHelper(context);
+                            Cursor cursor = loginHelper.getUserScoreByName(username, numCards);
+                            if (cursor.moveToFirst()) {
+                                int minAttemps = cursor.getInt(cursor.getColumnIndex(loginHelper.SCORE));
+                                Log.e(TAG, "MinAttemps " + minAttemps);
+                                if (minAttemps > score) {
+                                    Log.e(TAG, "Mejora de marca!");
+                                    ContentValues valuesToStore = new ContentValues();
+                                    valuesToStore.put(loginHelper.SCORE, score);
+                                    loginHelper.updateScoreByName(valuesToStore, username, numCards);
+                                } else Log.e(TAG, "No mejora :(");
+                            } else {
+                                Log.e(TAG, "Primera marca! :D");
+                                ContentValues valuesToStore = new ContentValues();
+                                valuesToStore.put(loginHelper.USERNAME, username);
+                                valuesToStore.put(loginHelper.SCORE, score);
+                                valuesToStore.put(loginHelper.NUMCARDS, numCards);
+                                loginHelper.createScore(valuesToStore);
+                            }
+                        }
+                    } else {
+                        // no son pareja, voltearlas
+                        Log.e(TAG, "No son pareja :(");
+                        flipCard(cardMemory, context.getDrawable(R.drawable.cover), 2000);
+                        flipCard(listCards.get(selCard), context.getDrawable(R.drawable.cover), 2000);
+
+                        cardMemory.setStateCard(R.drawable.cover);
+                        listCards.get(selCard).setStateCard(R.drawable.cover);
+                        textAttempts.setText(Integer.toString(Integer.parseInt(textAttempts.getText().toString()) + 1));
+                    }
+
+                    selCard = -1;
+                } else {
+                    // es la primera carta bocarriba
+                    selCard = pos;
+                }
+
                 break;
             default:
-                cardMemory.setStateCard(R.drawable.cover);
-                listCards.set(pos, cardMemory);
-
-                Log.e(TAG, "Carta " + pos + " - imagen " + cardMemory.getStateCard());
-
-                coolImageFlipper.flipImage(context.getDrawable(R.drawable.cover), cardMemory.getCard());
+                Log.e(TAG, "No deberia pasar");
                 break;
         }
+    }
+
+    private void flipCard(final CardMemory cardMemory, final Drawable newImage, int time) {
+        /*
+        new Thread(new Runnable() {
+            public void run() {
+                cardMemory.flipCard(context, newImage);
+            }
+        }).start();
+        */
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                cardMemory.flipCard(context, newImage);
+            }
+        }, time);
+    }
+
+    private void deleteCard(final CardMemory cardMemory, int time) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                cardMemory.getCard().setVisibility(View.INVISIBLE);
+            }
+        }, time);
     }
 
     @Override
@@ -181,6 +271,9 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
 
         outstate.putIntegerArrayList("idsCards", idsCards);
         outstate.putParcelableArrayList("listCards", listCards);
+        outstate.putInt("selCard", selCard);
+        outstate.putInt("numPairsLeft", numPairsLeft);
+        outstate.putString("numAttempts", textAttempts.getText().toString());
     }
 
     @Override
@@ -192,6 +285,9 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
 
             idsCards = (ArrayList) savedInstanceState.getIntegerArrayList("idsCards");
             listCards = (ArrayList) savedInstanceState.getParcelableArrayList("listCards");
+            selCard = savedInstanceState.getInt("selCard");
+            numPairsLeft = savedInstanceState.getInt("numPairsLeft");
+            textAttempts.setText(savedInstanceState.getString("numAttempts"));
 
             initCards();
         } else {

@@ -37,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
 
         SharedPreferences pref = context.getSharedPreferences("MyPref", Context.MODE_PRIVATE);
         final SharedPreferences.Editor editor = pref.edit();
-        String username = pref.getString("key_username", null); // getting String
+        String username = pref.getString("key_username", null);
 
         if (username == null) {
             // No hay usuario logeado
@@ -55,8 +55,8 @@ public class LoginActivity extends AppCompatActivity {
                     if (validateUser(name, pass)) {
                         Toast.makeText(context, "Login correcto!", Toast.LENGTH_SHORT).show();
 
-                        editor.putString("key_username", name); // Storing string
-                        editor.commit(); // commit changes
+                        editor.putString("key_username", name);
+                        editor.commit();
 
                         loginUser(name);
                     }
