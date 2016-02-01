@@ -4,9 +4,9 @@ import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.view.View;
 import android.widget.ImageView;
 
 public class CardMemory implements Parcelable {
@@ -46,7 +46,7 @@ public class CardMemory implements Parcelable {
         this.stateCard = stateCard;
     }
 
-    public void flipCard(final Context context, final Drawable newImage) {
+    public void flipCard(final Context context, final int newImage) {
         ObjectAnimator animCardStart = (ObjectAnimator) AnimatorInflater.loadAnimator(
                 context, R.animator.memory_cardflip);
         animCardStart.addListener(new Animator.AnimatorListener() {
@@ -58,9 +58,11 @@ public class CardMemory implements Parcelable {
             public void onAnimationEnd(Animator animation) {
                 ObjectAnimator animCardEnd = (ObjectAnimator) AnimatorInflater.loadAnimator(
                         context, R.animator.memory_cardflipend);
-                card.setImageDrawable(newImage);
+                card.setImageDrawable(context.getDrawable(newImage));
                 animCardEnd.setTarget(card);
                 animCardEnd.start();
+
+                setStateCard(newImage);
             }
 
             @Override
@@ -97,4 +99,9 @@ public class CardMemory implements Parcelable {
             return new CardMemory[size];
         }
     };
+
+    public void setInvisible() {
+        card.setVisibility(View.INVISIBLE);
+        this.setStateCard(0);
+    }
 }

@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class LoginHelper extends SQLiteOpenHelper {
 
     // Declaracion del nombre de la base de datos
-    public static final int DATABASE_VERSION = 5;
+    public static final int DATABASE_VERSION = 6;
 
     // Declaracion global de la version de la base de datos
     public static final String DATABASE_NAME = "USER_DB";
@@ -36,9 +36,10 @@ public class LoginHelper extends SQLiteOpenHelper {
             STREET + " TEXT );";
 
     public static final String SCORE_TABLE_CREATE = "CREATE TABLE " + SCORE_TABLE + " (" +
-            USERNAME + " TEXT PRIMARY KEY UNIQUE, " +
+            USERNAME + " TEXT, " +
             SCORE + " INT, " +
-            NUMCARDS + " INT);";
+            NUMCARDS + " INT," +
+            "PRIMARY KEY (" + USERNAME + "," + NUMCARDS +"));";
 
 
     public LoginHelper(Context context) {
@@ -128,5 +129,21 @@ public class LoginHelper extends SQLiteOpenHelper {
                 SCORE_TABLE,
                 null,
                 values);
+    }
+
+    public Cursor getAllScoresByNumcard(int numCards) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String[] columns = {USERNAME, SCORE};
+        String[] where = {Integer.toString(numCards)};
+        Cursor c = db.query(
+                SCORE_TABLE,                            // The table to query
+                columns,                                // The columns to return
+                NUMCARDS + "=?", // The columns for the WHERE clause
+                where,                                  // The values for the WHERE clause
+                null,                                   // don't group the rows
+                null,                                   // don't filter by row groups
+                null                                    // The sort order
+        );
+        return c;
     }
 }

@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private Context context;
     private Toolbar toolbar;
     private NavigationView navigationView;
-    private DrawerLayout drawerLayout;
+    public DrawerLayout drawerLayout;
     private LoginHelper loginHelper;
 
     private MenuItem prevMenuItem = null;

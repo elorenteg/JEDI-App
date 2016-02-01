@@ -35,7 +35,7 @@ public class GameActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        setupTabIcons();
+        //setupTabIcons();
     }
 
 

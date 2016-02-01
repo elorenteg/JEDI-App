@@ -4,13 +4,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -34,7 +34,7 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
 
     private TextView textAttempts;
 
-    private int numCards = 2;
+    private int numCards = 4;
     private ArrayList<Integer> idsCards;
     private ArrayList<CardMemory> listCards;
     private Integer selCard;
@@ -53,6 +53,8 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_memory, container, false);
+
+        setHasOptionsMenu(true);
 
         context = getContext();
         textAttempts = (TextView) rootView.findViewById(R.id.textAttempt);
@@ -141,17 +143,17 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
             int rand1 = randIds.get(i * 2);
             int rand2 = randIds.get(i * 2 + 1);
 
-            int pos1 = idsCards.indexOf(rand1);
-            int pos2 = idsCards.indexOf(rand2);
+            //int pos1 = idsCards.indexOf(rand1);
+            //int pos2 = idsCards.indexOf(rand2);
 
-            CardMemory card1 = listCards.get(pos1);
-            CardMemory card2 = listCards.get(pos2);
+            CardMemory card1 = listCards.get(idsCards.indexOf(rand1));
+            CardMemory card2 = listCards.get(idsCards.indexOf(rand2));
 
             card1.setAsignCard(possibleCards.get(i));
             card2.setAsignCard(possibleCards.get(i));
 
-            listCards.set(pos1, card1);
-            listCards.set(pos2, card2);
+            //listCards.set(pos1, card1);
+            //listCards.set(pos2, card2);
         }
     }
 
@@ -168,29 +170,24 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
                 cardMemory.setStateCard(cardMemory.getAsignCard());
                 //Log.e(TAG, "Carta " + pos + " - imagen " + cardMemory.getStateCard());
 
-                flipCard(cardMemory, context.getDrawable(cardMemory.getStateCard()), 0);
-                listCards.set(pos, cardMemory);
+                flipCard(cardMemory, cardMemory.getStateCard(), 0);
+                //listCards.set(pos, cardMemory);
 
                 if (selCard != -1) {
                     // hay dos cartas bocarriba
                     if (cardMemory.getStateCard() == listCards.get(selCard).getStateCard()) {
                         // son pareja, eliminarlas a los 2s
                         Log.e(TAG, "Pareja!");
-                        deleteCard(cardMemory, 2000);
-                        deleteCard(listCards.get(selCard), 2000);
-
-                        listCards.get(pos).setStateCard(0);
-                        listCards.get(selCard).setStateCard(0);
+                        deleteCards(cardMemory, listCards.get(selCard), 2000);
 
                         numPairsLeft = numPairsLeft - 1;
-                        textAttempts.setText(Integer.toString(Integer.parseInt(textAttempts.getText().toString()) + 1));
+                        int score = Integer.parseInt(textAttempts.getText().toString()) + 1;
+                        textAttempts.setText(Integer.toString(score));
 
                         if (numPairsLeft == 0) {
                             Log.e(TAG, "Final del juego!!");
-                            int score = Integer.parseInt(textAttempts.getText().toString());
 
                             SharedPreferences pref = context.getSharedPreferences("MyPref", Context.MODE_PRIVATE);
-                            final SharedPreferences.Editor editor = pref.edit();
                             String username = pref.getString("key_username", null);
 
                             loginHelper = new LoginHelper(context);
@@ -198,29 +195,26 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
                             if (cursor.moveToFirst()) {
                                 int minAttemps = cursor.getInt(cursor.getColumnIndex(loginHelper.SCORE));
                                 Log.e(TAG, "MinAttemps " + minAttemps);
+
                                 if (minAttemps > score) {
                                     Log.e(TAG, "Mejora de marca!");
-                                    ContentValues valuesToStore = new ContentValues();
-                                    valuesToStore.put(loginHelper.SCORE, score);
-                                    loginHelper.updateScoreByName(valuesToStore, username, numCards);
-                                } else Log.e(TAG, "No mejora :(");
+                                    updateScore(username, numCards, score);
+                                } else {
+                                    Log.e(TAG, "No mejora :(");
+                                }
                             } else {
                                 Log.e(TAG, "Primera marca! :D");
-                                ContentValues valuesToStore = new ContentValues();
-                                valuesToStore.put(loginHelper.USERNAME, username);
-                                valuesToStore.put(loginHelper.SCORE, score);
-                                valuesToStore.put(loginHelper.NUMCARDS, numCards);
-                                loginHelper.createScore(valuesToStore);
+                                createScore(username, numCards, score);
                             }
                         }
                     } else {
                         // no son pareja, voltearlas
                         Log.e(TAG, "No son pareja :(");
-                        flipCard(cardMemory, context.getDrawable(R.drawable.cover), 2000);
-                        flipCard(listCards.get(selCard), context.getDrawable(R.drawable.cover), 2000);
+                        flipCard(cardMemory, R.drawable.cover, 2000);
+                        flipCard(listCards.get(selCard), R.drawable.cover, 2000);
 
-                        cardMemory.setStateCard(R.drawable.cover);
-                        listCards.get(selCard).setStateCard(R.drawable.cover);
+                        //cardMemory.setStateCard(R.drawable.cover);
+                        //listCards.get(selCard).setStateCard(R.drawable.cover);
                         textAttempts.setText(Integer.toString(Integer.parseInt(textAttempts.getText().toString()) + 1));
                     }
 
@@ -237,15 +231,21 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void flipCard(final CardMemory cardMemory, final Drawable newImage, int time) {
-        /*
-        new Thread(new Runnable() {
-            public void run() {
-                cardMemory.flipCard(context, newImage);
-            }
-        }).start();
-        */
+    private void createScore(String username, int numCards, int score) {
+        ContentValues valuesToStore = new ContentValues();
+        valuesToStore.put(loginHelper.USERNAME, username);
+        valuesToStore.put(loginHelper.SCORE, score);
+        valuesToStore.put(loginHelper.NUMCARDS, numCards);
+        loginHelper.createScore(valuesToStore);
+    }
 
+    private void updateScore(String username, int numCards, int score) {
+        ContentValues valuesToStore = new ContentValues();
+        valuesToStore.put(loginHelper.SCORE, score);
+        loginHelper.updateScoreByName(valuesToStore, username, numCards);
+    }
+
+    private void flipCard(final CardMemory cardMemory, final int newImage, int time) {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -254,11 +254,12 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         }, time);
     }
 
-    private void deleteCard(final CardMemory cardMemory, int time) {
+    private void deleteCards(final CardMemory cardMemory1, final CardMemory cardMemory2, int time) {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                cardMemory.getCard().setVisibility(View.INVISIBLE);
+                cardMemory1.setInvisible();
+                cardMemory2.setInvisible();
             }
         }, time);
     }
@@ -300,4 +301,26 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    /*
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_memory, menu);
+    }
+    */
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.action_settings:
+                Log.e(TAG, "hola");
+                return true;
+            case R.id.num4:
+                Log.e(TAG, "hola");
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }
