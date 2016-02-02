@@ -39,7 +39,7 @@ public class LoginHelper extends SQLiteOpenHelper {
             USERNAME + " TEXT, " +
             SCORE + " INT, " +
             NUMCARDS + " INT," +
-            "PRIMARY KEY (" + USERNAME + "," + NUMCARDS +"));";
+            "PRIMARY KEY (" + USERNAME + "," + NUMCARDS + "));";
 
 
     public LoginHelper(Context context) {

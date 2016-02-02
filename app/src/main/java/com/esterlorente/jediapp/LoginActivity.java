@@ -35,46 +35,44 @@ public class LoginActivity extends AppCompatActivity {
 
         context = getApplicationContext();
 
+        loginHelper = new LoginHelper(context);
         SharedPreferences pref = context.getSharedPreferences("MyPref", Context.MODE_PRIVATE);
         final SharedPreferences.Editor editor = pref.edit();
+
+        buttonLogin = (Button) findViewById(R.id.buttonLogin);
+        editName = (EditText) findViewById(R.id.editName);
+        editPass = (EditText) findViewById(R.id.editPass);
+        View.OnClickListener lis = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = editName.getText().toString();
+                String pass = editPass.getText().toString();
+
+                if (validateUser(name, pass)) {
+                    Toast.makeText(context, "Login correcto!", Toast.LENGTH_SHORT).show();
+
+                    editor.putString("key_username", name);
+                    editor.commit();
+
+                    loginUser(name);
+                }
+            }
+        };
+        buttonLogin.setOnClickListener(lis);
+
+        textNoAccount = (TextView) findViewById(R.id.textNoAccount);
+        View.OnClickListener lis2 = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, SignupActivity.class);
+                startActivity(intent);
+            }
+        };
+        textNoAccount.setOnClickListener(lis2);
+
+
         String username = pref.getString("key_username", null);
-
-        if (username == null) {
-            // No hay usuario logeado
-            loginHelper = new LoginHelper(context);
-
-            buttonLogin = (Button) findViewById(R.id.buttonLogin);
-            editName = (EditText) findViewById(R.id.editName);
-            editPass = (EditText) findViewById(R.id.editPass);
-            View.OnClickListener lis = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String name = editName.getText().toString();
-                    String pass = editPass.getText().toString();
-
-                    if (validateUser(name, pass)) {
-                        Toast.makeText(context, "Login correcto!", Toast.LENGTH_SHORT).show();
-
-                        editor.putString("key_username", name);
-                        editor.commit();
-
-                        loginUser(name);
-                    }
-                }
-            };
-            buttonLogin.setOnClickListener(lis);
-
-            textNoAccount = (TextView) findViewById(R.id.textNoAccount);
-            View.OnClickListener lis2 = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(context, SignupActivity.class);
-                    startActivity(intent);
-                }
-            };
-            textNoAccount.setOnClickListener(lis2);
-        } else {
-            // Usuario ya se habia logeado
+        if (username != null) {
             loginUser(username);
         }
     }

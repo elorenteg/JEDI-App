@@ -4,21 +4,21 @@
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-
     <TextView
+        android:id="@+id/headerUser"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="qwerty"
-        android:id="@+id/textUser"
-        android:textSize="20dp"
         android:textIsSelectable="false"
-        android:layout_weight="1" />
+        android:textSize="30dp" />
 
     <TextView
+        android:id="@+id/headerScore"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="4"
-        android:id="@+id/textScore"
-        android:textSize="20dp"
-        android:layout_weight="1" />
+        android:textSize="30dp" />
+
 </LinearLayout>

@@ -2,11 +2,13 @@ package com.esterlorente.jediapp;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -46,6 +48,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //Creamos el primer fragment, y no le pasamos argumentos!
+        setTitle("Fragment 1");
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction =
+                fragmentManager.beginTransaction();
+        //Reemplazamos el Frame Layout de la Activity por el nuevo fragment.
+        //El Frame Layout es el contenedor
+        fragmentTransaction.replace(R.id.content_frame, new ProfileFragment());
+        fragmentTransaction.commit();
 
         // Anadir Toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -61,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
         initNavigationDrawer();
 
+        /*
         ///
 
         buttonCalc = (Button) findViewById(R.id.buttonCalc);
@@ -109,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         buttonLogout.setOnClickListener(lis4);
+        */
     }
 
     private void initNavigationDrawer() {
@@ -148,10 +161,18 @@ public class MainActivity extends AppCompatActivity {
                 // Closing drawer on item click
                 drawerLayout.closeDrawers();
 
+                Fragment f = null;
+
                 // Check to see which item was being clicked and perform appropriate action
                 switch (menuItem.getItemId()) {
+                    case R.id.menu_profile:
+                        Toast.makeText(context, "Profile selected", Toast.LENGTH_SHORT).show();
+                        f = new ProfileFragment();
+                        break;
+
                     case R.id.menu_music:
                         Toast.makeText(context, "Music selected", Toast.LENGTH_SHORT).show();
+                        f = new MusicFragment();
                         break;
 
                     case R.id.menu_game:
@@ -168,6 +189,15 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(context, "Settings Selected", Toast.LENGTH_SHORT).show();
                         break;
                 }
+
+                if (f != null) {
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction =
+                            fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.content_frame, f);
+                    fragmentTransaction.commit();
+                }
+
                 return true;
             }
         });

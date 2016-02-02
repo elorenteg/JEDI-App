@@ -3,6 +3,10 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/menu_profile"
+            android:icon="@drawable/pizza"
+            android:title="@string/profile" />
+        <item
             android:id="@+id/menu_music"
             android:icon="@drawable/pizza"
             android:title="@string/music" />
