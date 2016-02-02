@@ -50,7 +50,7 @@ public class GameFragment extends Fragment {
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getActivity().getSupportFragmentManager());
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
         adapter.addFragment(new MemoryFragment(), getResources().getText(R.string.memoryTabname).toString());
         adapter.addFragment(new RanquingFragment(), getResources().getText(R.string.ranquingTabname).toString());
         viewPager.setAdapter(adapter);
