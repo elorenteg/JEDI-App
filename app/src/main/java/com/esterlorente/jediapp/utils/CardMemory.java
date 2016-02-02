@@ -1,4 +1,4 @@
-package com.esterlorente.jediapp;
+package com.esterlorente.jediapp.utils;
 
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
@@ -8,6 +8,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.view.View;
 import android.widget.ImageView;
+
+import com.esterlorente.jediapp.R;
 
 public class CardMemory implements Parcelable {
     private ImageView card;

@@ -1,7 +1,6 @@
 package com.esterlorente.jediapp;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -16,8 +15,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,20 +33,15 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem prevMenuItem = null;
     private String username;
 
-    private EditText editCalc;
-    private Button buttonCalc;
-
-    private EditText editWeird;
-    private Button buttonWeird;
-
-    private Button buttonLogout;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        setTitle(getString(R.string.app_name));
+
         //Creamos el primer fragment, y no le pasamos argumentos!
-        setTitle("Fragment 1");
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction =
                 fragmentManager.beginTransaction();
@@ -71,57 +63,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         initNavigationDrawer();
-
-        /*
-        ///
-
-        buttonCalc = (Button) findViewById(R.id.buttonCalc);
-        editCalc = (EditText) findViewById(R.id.editCalc);
-        View.OnClickListener lis = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, CalculadoraActivity.class);
-                Bundle bundle = new Bundle();
-                String text = editCalc.getText().toString();
-                bundle.putString("editTextOper", text);
-                intent.putExtras(bundle);
-                startActivity(intent);
-            }
-        };
-        buttonCalc.setOnClickListener(lis);
-
-        buttonWeird = (Button) findViewById(R.id.buttonWeird);
-        editWeird = (EditText) findViewById(R.id.editWeird);
-        View.OnClickListener lis3 = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, GameActivity.class);
-                String text = editWeird.getText().toString();
-                if (!text.equals("")) {
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("editNumCards", Integer.valueOf(text));
-                    intent.putExtras(bundle);
-                }
-                startActivity(intent);
-            }
-        };
-        buttonWeird.setOnClickListener(lis3);
-
-        buttonLogout = (Button) findViewById(R.id.buttonLogout);
-        View.OnClickListener lis4 = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = pref.edit();
-                editor.remove("key_username");
-                editor.commit();
-
-                Intent intent = new Intent(context, LoginActivity.class);
-                startActivity(intent);
-            }
-        };
-        buttonLogout.setOnClickListener(lis4);
-        */
     }
 
     private void initNavigationDrawer() {
@@ -177,12 +118,12 @@ public class MainActivity extends AppCompatActivity {
 
                     case R.id.menu_game:
                         Toast.makeText(context, "Game Selected", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(context, GameActivity.class));
+                        f = new GameFragment();
                         break;
 
                     case R.id.menu_calculator:
                         Toast.makeText(context, "Calculator Selected", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(context, CalculadoraActivity.class));
+                        f = new CalculatorFragment();
                         break;
 
                     case R.id.menu_settiongs:

@@ -12,7 +12,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.esterlorente.jediapp.adapters.MyCustomAdapter;
 import com.esterlorente.jediapp.data.LoginHelper;
+import com.esterlorente.jediapp.utils.Score;
 
 import java.util.ArrayList;
 

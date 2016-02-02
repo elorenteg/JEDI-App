@@ -1,4 +1,4 @@
-package com.esterlorente.jediapp;
+package com.esterlorente.jediapp.utils;
 
 
 public class Parser {

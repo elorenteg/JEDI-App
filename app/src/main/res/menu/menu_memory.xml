@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.esterlorente.jediapp.GameActivity">
+    tools:context="com.esterlorente.jediapp.GameFragment">
 
     <item
         android:id="@+id/numCards"

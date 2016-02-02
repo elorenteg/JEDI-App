@@ -1,10 +1,13 @@
-package com.esterlorente.jediapp;
+package com.esterlorente.jediapp.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.esterlorente.jediapp.R;
+import com.esterlorente.jediapp.utils.Score;
 
 import java.util.ArrayList;
 
@@ -15,7 +18,7 @@ public class MyCustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     ArrayList<Score> scores;
 
-    MyCustomAdapter(ArrayList<Score> scores) {
+    public MyCustomAdapter(ArrayList<Score> scores) {
         this.scores = scores;
     }
 
@@ -80,7 +83,7 @@ public class MyCustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     private Score getItem(int position) {
-        return scores.get(position-1);
+        return scores.get(position - 1);
     }
 
 

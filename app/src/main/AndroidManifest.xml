@@ -21,12 +21,6 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_loged" />
-        <activity
-            android:name=".CalculadoraActivity"
-            android:label="@string/title_activity_calculadora" />
-        <activity
-            android:name=".GameActivity"
-            android:label="@string/title_activity_game" />
     </application>
 
 </manifest>

@@ -1,14 +1,10 @@
 package com.esterlorente.jediapp;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -17,75 +13,49 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.esterlorente.jediapp.data.LoginHelper;
+import com.esterlorente.jediapp.utils.MathEval;
 
-public class CalculadoraActivity extends AppCompatActivity implements View.OnClickListener {
-    private String TAG = "CALCULADORA_ACTIVITY";
+
+public class CalculatorFragment extends Fragment implements View.OnClickListener {
+    private String TAG = "GAME_FRAGMENT";
+    private Context context;
+    private View rootView;
+    private LoginHelper loginHelper;
 
     private TextView textOper, textRes;
     private Button button0, button1, button2, button3, button4, button5, button6, button7, button8, button9;
     private Button buttonPlus, buttonMin, buttonProd, buttonDiv, buttonDot, buttonEqu, buttonDel;
 
+
+    public CalculatorFragment() {
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_calc);
+    }
 
-        // Anadir Toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        rootView = inflater.inflate(R.layout.fragment_calculator, container, false);
+        context = getActivity();
+        loginHelper = new LoginHelper(context);
+        setHasOptionsMenu(true);
 
-        textOper = (TextView) findViewById(R.id.text_oper);
+        textOper = (TextView) rootView.findViewById(R.id.text_oper);
         textOper.setText("");
-        textRes = (TextView) findViewById(R.id.text_res);
+        textRes = (TextView) rootView.findViewById(R.id.text_res);
         textRes.setText("");
 
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
-            String value = bundle.getString("editTextOper");
-            Log.e(TAG, "Paso valor: " + value);
-            textOper.setText(value);
-        } else Log.e(TAG, "Intent - No hay valor");
-
         initButtons();
+
+        return rootView;
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_calc, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.settings:
-                return true;
-            case R.id.exit:
-                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:934137660"));
-                startActivity(intent);
-                /*
-                Intent intent = new Intent(this, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // this will clear all the stack
-                intent.putExtra("Exit me", true);
-                startActivity(intent);
-                finish();
-                */
-                /*
-                Intent i = new Intent(this, LoginActivity.class);
-                // set the new task and clear flags
-                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(i);
-                finish();
-                */
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outstate) {
+    public void onSaveInstanceState(Bundle outstate) {
         super.onSaveInstanceState(outstate);
 
         outstate.putString("textOper", textOper.getText().toString());
@@ -96,14 +66,17 @@ public class CalculadoraActivity extends AppCompatActivity implements View.OnCli
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
-        textOper.setText(savedInstanceState.getString("textOper"));
-        Log.v(TAG, "Restableciendo textOper: " + savedInstanceState.getString("textOper"));
+        if (savedInstanceState != null) {
+            textOper.setText(savedInstanceState.getString("textOper"));
+            Log.v(TAG, "Restableciendo textOper: " + savedInstanceState.getString("textOper"));
 
-        textRes.setText(savedInstanceState.getString("textRes"));
-        Log.v(TAG, "Restableciendo textRes: " + savedInstanceState.getString("textRes"));
+            textRes.setText(savedInstanceState.getString("textRes"));
+            Log.v(TAG, "Restableciendo textRes: " + savedInstanceState.getString("textRes"));
+        }
+
     }
 
 
@@ -187,7 +160,7 @@ public class CalculadoraActivity extends AppCompatActivity implements View.OnCli
                 result = evaluateExpression(textOper.getText().toString());
 
 
-                Animation animOper = AnimationUtils.loadAnimation(this, R.anim.calc_oper);
+                Animation animOper = AnimationUtils.loadAnimation(context, R.anim.calc_oper);
                 animOper.reset();
                 textOper.clearAnimation();
                 animOper.setAnimationListener(new Animation.AnimationListener() {
@@ -207,7 +180,7 @@ public class CalculadoraActivity extends AppCompatActivity implements View.OnCli
                 });
                 textOper.startAnimation(animOper);
 
-                Animation animRes = AnimationUtils.loadAnimation(this, R.anim.calc_res);
+                Animation animRes = AnimationUtils.loadAnimation(context, R.anim.calc_res);
                 animRes.reset();
                 textRes.clearAnimation();
 
@@ -260,23 +233,23 @@ public class CalculadoraActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void initButtons() {
-        button0 = (Button) findViewById(R.id.button_0);
-        button1 = (Button) findViewById(R.id.button_1);
-        button2 = (Button) findViewById(R.id.button_2);
-        button3 = (Button) findViewById(R.id.button_3);
-        button4 = (Button) findViewById(R.id.button_4);
-        button5 = (Button) findViewById(R.id.button_5);
-        button6 = (Button) findViewById(R.id.button_6);
-        button7 = (Button) findViewById(R.id.button_7);
-        button8 = (Button) findViewById(R.id.button_8);
-        button9 = (Button) findViewById(R.id.button_9);
-        buttonPlus = (Button) findViewById(R.id.button_plus);
-        buttonMin = (Button) findViewById(R.id.button_min);
-        buttonProd = (Button) findViewById(R.id.button_prod);
-        buttonDiv = (Button) findViewById(R.id.button_div);
-        buttonDot = (Button) findViewById(R.id.button_dot);
-        buttonEqu = (Button) findViewById(R.id.button_equ);
-        buttonDel = (Button) findViewById(R.id.button_del);
+        button0 = (Button) rootView.findViewById(R.id.button_0);
+        button1 = (Button) rootView.findViewById(R.id.button_1);
+        button2 = (Button) rootView.findViewById(R.id.button_2);
+        button3 = (Button) rootView.findViewById(R.id.button_3);
+        button4 = (Button) rootView.findViewById(R.id.button_4);
+        button5 = (Button) rootView.findViewById(R.id.button_5);
+        button6 = (Button) rootView.findViewById(R.id.button_6);
+        button7 = (Button) rootView.findViewById(R.id.button_7);
+        button8 = (Button) rootView.findViewById(R.id.button_8);
+        button9 = (Button) rootView.findViewById(R.id.button_9);
+        buttonPlus = (Button) rootView.findViewById(R.id.button_plus);
+        buttonMin = (Button) rootView.findViewById(R.id.button_min);
+        buttonProd = (Button) rootView.findViewById(R.id.button_prod);
+        buttonDiv = (Button) rootView.findViewById(R.id.button_div);
+        buttonDot = (Button) rootView.findViewById(R.id.button_dot);
+        buttonEqu = (Button) rootView.findViewById(R.id.button_equ);
+        buttonDel = (Button) rootView.findViewById(R.id.button_del);
 
         button0.setOnClickListener(this);
         button1.setOnClickListener(this);
@@ -300,7 +273,6 @@ public class CalculadoraActivity extends AppCompatActivity implements View.OnCli
     private String evaluateExpression(String text) {
         text = (String) textOper.getText();
         MathEval math = new MathEval();
-        Context context = getApplicationContext();
         double result = -1;
         try {
             result = math.evaluate(text);
@@ -311,18 +283,4 @@ public class CalculadoraActivity extends AppCompatActivity implements View.OnCli
         }
         return String.valueOf(result).replaceAll("\\.0*$", "");
     }
-
-
-    // asignacion listeners recursivo
-    void assignClickLHandler(ViewGroup root) {
-        for (int i = 0; i < root.getChildCount(); ++i) {
-            if (root.getChildAt(i) instanceof ViewGroup) {
-                assignClickLHandler((ViewGroup) root.getChildAt(i));
-            } else {
-                (root.getChildAt(i)).setOnClickListener(this);
-            }
-        }
-    }
-
-
 }

@@ -21,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.esterlorente.jediapp.data.LoginHelper;
+import com.esterlorente.jediapp.utils.CardMemory;
+import com.esterlorente.jediapp.utils.Score;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -230,9 +232,9 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
 
     private void showEndGame() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(context)
-                .setTitle(R.string.complete)//.setIcon(R.drawable.icon)
-                .setMessage(R.string.alert_mss + " " + textAttempts.getText())
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                .setTitle(getString(R.string.complete))//.setIcon(R.drawable.icon)
+                .setMessage(getString(R.string.alert_mss) + " " + textAttempts.getText())
+                .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Toast.makeText(context, "POS enter a text here", Toast.LENGTH_SHORT).show();
                     }

@@ -1,4 +1,4 @@
-package com.esterlorente.jediapp;
+package com.esterlorente.jediapp.utils;
 
 // Created by Lawrence PC Dol.  Released into the public domain.
 // http://tech.dolhub.com

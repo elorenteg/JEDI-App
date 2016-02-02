@@ -1,15 +1,12 @@
-package com.esterlorente.jediapp;
+package com.esterlorente.jediapp.utils;
 
 public class Score {
     private String username;
     private int score;
 
-    Score(String username, int score) {
+    public Score(String username, int score) {
         this.username = username;
         this.score = score;
-    }
-
-    Score() {
     }
 
     public String getUsername() {
