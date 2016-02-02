@@ -20,7 +20,7 @@ import com.esterlorente.jediapp.utils.MathEval;
 
 
 public class CalculatorFragment extends Fragment implements View.OnClickListener {
-    private String TAG = "GAME_FRAGMENT";
+    private String TAG = "CALCULATOR_FRAGMENT";
     private Context context;
     private View rootView;
     private LoginHelper loginHelper;
@@ -51,6 +51,14 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
         textRes = (TextView) rootView.findViewById(R.id.text_res);
         textRes.setText("");
 
+        if (savedInstanceState != null) {
+            textOper.setText(savedInstanceState.getString("textOper"));
+            Log.v(TAG, "Restableciendo textOper: " + savedInstanceState.getString("textOper"));
+
+            textRes.setText(savedInstanceState.getString("textRes"));
+            Log.v(TAG, "Restableciendo textRes: " + savedInstanceState.getString("textRes"));
+        }
+
         initButtons();
 
         return rootView;
@@ -71,6 +79,7 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        /*
         if (savedInstanceState != null) {
             textOper.setText(savedInstanceState.getString("textOper"));
             Log.v(TAG, "Restableciendo textOper: " + savedInstanceState.getString("textOper"));
@@ -79,6 +88,7 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
             Log.v(TAG, "Restableciendo textRes: " + savedInstanceState.getString("textRes"));
         }
 
+*/
     }
 
 

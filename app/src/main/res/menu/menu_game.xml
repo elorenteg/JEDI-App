@@ -4,9 +4,10 @@
     tools:context="com.esterlorente.jediapp.GameFragment">
     <item
         android:id="@+id/numCards"
-        android:icon="@drawable/burger"
+        android:icon="@drawable/ic_credit_card"
+        android:orderInCategory="1"
         android:title="@string/numCards"
-        app:showAsAction="ifRoom">
+        app:showAsAction="always">
         <menu android:checkableBehavior="single">
             <item
                 android:id="@+id/num2"
@@ -25,15 +26,8 @@
 
     <item
         android:id="@+id/restart"
-        android:icon="@drawable/ic_autorenew_black_24dp"
-        android:orderInCategory="100"
+        android:icon="@drawable/ic_autorenew"
+        android:orderInCategory="2"
         android:title="@string/restart"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/logout"
-        android:icon="@drawable/burger"
-        android:orderInCategory="100"
-        android:title="@string/logout"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 </menu>

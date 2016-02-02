@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 
 public class ProfileFragment extends android.support.v4.app.Fragment {
+    private String TAG = "PROFILE_FRAGMENT";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

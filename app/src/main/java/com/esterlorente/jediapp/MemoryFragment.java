@@ -40,10 +40,10 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
     private TextView textAttempts;
 
     private int numCards = 4;
+    private int numPairsLeft = numCards * numCards / 2;
     private ArrayList<Integer> idsCards;
     private ArrayList<CardMemory> listCards;
     private Integer selCard;
-    private int numPairsLeft;
 
     public MemoryFragment() {
     }
@@ -296,9 +296,9 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (savedInstanceState != null) {
-            Log.e(TAG, "Restaurando datos");
+        Log.e(TAG, "Restaurando datos");
 
+        if (savedInstanceState != null) {
             numCards = savedInstanceState.getInt("numCards");
             idsCards = (ArrayList) savedInstanceState.getIntegerArrayList("idsCards");
             listCards = (ArrayList) savedInstanceState.getParcelableArrayList("listCards");
@@ -323,9 +323,6 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         ArrayList<Score> scores;
 
         switch (id) {
-            case R.id.settings:
-                Log.e(TAG, "memory");
-                return true;
             case R.id.num2:
                 Log.e(TAG, "memory");
                 restartMemory(2);

@@ -47,6 +47,8 @@ public class RanquingFragment extends Fragment {
         loginHelper = new LoginHelper(context);
         setHasOptionsMenu(true);
 
+        initRanquing();
+
         return rootView;
     }
 
@@ -68,40 +70,38 @@ public class RanquingFragment extends Fragment {
         return scores;
     }
 
-    /*
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_ranquing, menu);
-    }
-    */
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         ArrayList<Score> scores;
 
         switch (id) {
-            case R.id.settings:
-                Log.e(TAG, "ranquing");
-                return true;
             case R.id.num2:
                 Log.e(TAG, "ranquing");
-                scores = getScoresByCard(2);
+                numCards = 2;
+                scores = getScoresByCard(numCards);
                 adapter.changeData(scores);
                 return true;
             case R.id.num4:
                 Log.e(TAG, "ranquing");
-                scores = getScoresByCard(4);
+                numCards = 4;
+                scores = getScoresByCard(numCards);
                 adapter.changeData(scores);
                 return true;
             case R.id.num6:
                 Log.e(TAG, "ranquing");
-                scores = getScoresByCard(6);
+                numCards = 6;
+                scores = getScoresByCard(numCards);
                 adapter.changeData(scores);
                 return true;
             case R.id.num8:
                 Log.e(TAG, "ranquing");
-                scores = getScoresByCard(8);
+                numCards = 8;
+                scores = getScoresByCard(numCards);
+                adapter.changeData(scores);
+                return true;
+            case R.id.restart:
+                scores = getScoresByCard(numCards);
                 adapter.changeData(scores);
                 return true;
         }

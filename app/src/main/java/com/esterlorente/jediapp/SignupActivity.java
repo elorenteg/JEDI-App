@@ -8,8 +8,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,12 +17,10 @@ import android.widget.Toast;
 import com.esterlorente.jediapp.data.LoginHelper;
 
 public class SignupActivity extends AppCompatActivity {
-    private String TAG = "LOGIN_ACTIVITY";
+    private String TAG = "SIGNUP_ACTIVITY";
 
     private Context context;
     private LoginHelper loginHelper;
-
-    private String username = null;
 
     private EditText editName;
     private EditText editPass;
@@ -138,30 +134,19 @@ public class SignupActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outstate) {
         super.onSaveInstanceState(outstate);
 
-        outstate.putString("username", username);
-        Log.v(TAG, "Guardando username: " + username);
+        outstate.putString("editName", editName.getText().toString());
+        outstate.putString("editEmail", editEmail.getText().toString());
+        outstate.putString("editPass", editPass.getText().toString());
+        Log.v(TAG, "Guardando estado");
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
 
-        username = (savedInstanceState.getString("username"));
-        Log.v(TAG, "Restableciendo username: " + savedInstanceState.getString("username"));
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        //getMenuInflater().inflate(R.menu.simple_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        editName.setText(savedInstanceState.getString("editName"));
+        editEmail.setText(savedInstanceState.getString("editEmail"));
+        editPass.setText(savedInstanceState.getString("editPass"));
+        Log.v(TAG, "Restableciendo estado");
     }
 }

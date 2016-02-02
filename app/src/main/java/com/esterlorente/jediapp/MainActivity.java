@@ -1,6 +1,8 @@
 package com.esterlorente.jediapp;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -24,13 +26,16 @@ import com.esterlorente.jediapp.data.LoginHelper;
 public class MainActivity extends AppCompatActivity {
     private String TAG = "MAIN_ACTIVITY";
 
+    private int FRAGMENT_TAG_INT;
+    private String FRAGMENT_TAG;
+    private Fragment fragment;
+
     private Context context;
     private Toolbar toolbar;
     private NavigationView navigationView;
     public DrawerLayout drawerLayout;
     private LoginHelper loginHelper;
 
-    private Fragment fragment;
     private MenuItem prevMenuItem = null;
     private String username;
 
@@ -41,8 +46,22 @@ public class MainActivity extends AppCompatActivity {
 
         setTitle(getString(R.string.app_name));
 
-        if (fragment == null) fragment = new ProfileFragment();
-        initFragment(fragment);
+        /*
+        if (savedInstanceState == null) {
+            fragment = new ProfileFragment();
+            FRAGMENT_TAG = R.string.profile;
+            initFragment();
+        }
+        */
+
+        if (savedInstanceState != null) {
+            fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+        } else {
+            fragment = new ProfileFragment();
+            FRAGMENT_TAG = getString(R.string.profile);
+            Log.e(TAG, FRAGMENT_TAG);
+            getSupportFragmentManager().beginTransaction().add(R.id.content_frame, fragment, FRAGMENT_TAG).commit();
+        }
 
         // Anadir Toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -97,39 +116,38 @@ public class MainActivity extends AppCompatActivity {
                 drawerLayout.closeDrawers();
 
                 Fragment f = null;
+                int tag = -1;
+
 
                 // Check to see which item was being clicked and perform appropriate action
                 switch (menuItem.getItemId()) {
                     case R.id.menu_profile:
-                        //Toast.makeText(context, "Profile selected", Toast.LENGTH_SHORT).show();
-                        setTitle(getString(R.string.profile));
                         f = new ProfileFragment();
+                        tag = R.string.profile;
                         break;
-
                     case R.id.menu_music:
-                        //Toast.makeText(context, "Music selected", Toast.LENGTH_SHORT).show();
                         f = new MusicFragment();
+                        tag = R.string.music;
                         break;
-
                     case R.id.menu_game:
-                        //Toast.makeText(context, "Game Selected", Toast.LENGTH_SHORT).show();
                         f = new GameFragment();
+                        tag = R.string.game;
                         break;
-
                     case R.id.menu_calculator:
-                        //Toast.makeText(context, "Calculator Selected", Toast.LENGTH_SHORT).show();
                         f = new CalculatorFragment();
+                        tag = R.string.calculator;
                         break;
-
                     case R.id.menu_settings:
-                        //Toast.makeText(context, "Settings Selected", Toast.LENGTH_SHORT).show();
                         break;
                 }
 
                 if (f != null) {
                     fragment = f;
-                    initFragment(f);
+                    FRAGMENT_TAG = getString(tag);
+                    setTitle(FRAGMENT_TAG);
+                    initFragment();
                 }
+
 
                 return true;
             }
@@ -164,75 +182,66 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
-            default:
-                return super.onOptionsItemSelected(item);
+            case R.id.settings:
+                // TODO: settings
+                return true;
+            case R.id.logout:
+                logoutUser();
+                return true;
         }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void logoutUser() {
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
+        SharedPreferences.Editor editor = pref.edit();
+        editor.remove("key_username");
+        editor.commit();
+
+        Intent intent = new Intent(context, LoginActivity.class);
+        startActivity(intent);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outstate) {
         super.onSaveInstanceState(outstate);
 
-        outstate.putString("fragmentTag", fragment.getTag());
-        Log.v(TAG, "Guardando fragment: " + fragment.getTag());
+        outstate.putString("fragmentTag", FRAGMENT_TAG);
+        Log.v(TAG, "Guardando fragment: " + FRAGMENT_TAG);
+
+        FragmentManager manager = getSupportFragmentManager();
+        manager.putFragment(outstate, FRAGMENT_TAG, fragment);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
 
-        String fragmentTag = savedInstanceState.getString("fragmentTag");
-        restoreFragment(fragmentTag);
+        FRAGMENT_TAG = savedInstanceState.getString("fragmentTag");
+        Log.v(TAG, "Restableciendo fragment: " + FRAGMENT_TAG);
 
-        Log.v(TAG, "Restableciendo fragment: " + fragmentTag);
+        restoreFragment(savedInstanceState);
     }
 
-    private void restoreFragment(String fragmentTag) {
-        switch (fragmentTag) {
-            case "ProfileFragment":
-                //Toast.makeText(context, "Profile selected", Toast.LENGTH_SHORT).show();
-                setTitle(getString(R.string.profile));
-                if (fragment != null && !fragmentTag.equals(fragment.getTag()))
-                    fragment = new ProfileFragment();
-                break;
+    private void restoreFragment(Bundle savedInstanceState) {
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
 
-            case "MusicFragment":
-                //Toast.makeText(context, "Music selected", Toast.LENGTH_SHORT).show();
-                setTitle(getString(R.string.music));
-                if (fragment != null && !fragmentTag.equals(fragment.getTag()))
-                    fragment = new MusicFragment();
-                break;
-
-            case "GameFragment":
-                //Toast.makeText(context, "Game Selected", Toast.LENGTH_SHORT).show();
-                setTitle(getString(R.string.game));
-                if (fragment != null && !fragmentTag.equals(fragment.getTag()))
-                    fragment = new GameFragment();
-                break;
-
-            case "CalculatorFragment":
-                //Toast.makeText(context, "Calculator Selected", Toast.LENGTH_SHORT).show();
-                setTitle(getString(R.string.calculator));
-                if (fragment != null && !fragmentTag.equals(fragment.getTag()))
-                    fragment = new CalculatorFragment();
-                break;
-
-            case "Settings":
-                //Toast.makeText(context, "Settings Selected", Toast.LENGTH_SHORT).show();
-                setTitle(getString(R.string.settings));
-                break;
+        if (savedInstanceState != null) {
+            fragment = (Fragment) manager.getFragment(savedInstanceState, FRAGMENT_TAG);
+        } else {
+            fragment = new ProfileFragment();
+            transaction.add(R.id.content_frame, fragment, FRAGMENT_TAG);
+            transaction.commit();
         }
-
-        initFragment(fragment);
     }
 
-    private void initFragment(Fragment fragment) {
+    private void initFragment() {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction =
-                fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content_frame, fragment);
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.content_frame, fragment, FRAGMENT_TAG.toString());
         fragmentTransaction.commit();
     }
 }
