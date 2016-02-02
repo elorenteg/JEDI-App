@@ -13,11 +13,11 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.esterlorente.jediapp.data.LoginHelper;
 
@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     public DrawerLayout drawerLayout;
     private LoginHelper loginHelper;
 
+    private Fragment fragment;
     private MenuItem prevMenuItem = null;
     private String username;
 
@@ -40,15 +41,8 @@ public class MainActivity extends AppCompatActivity {
 
         setTitle(getString(R.string.app_name));
 
-        //Creamos el primer fragment, y no le pasamos argumentos!
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction =
-                fragmentManager.beginTransaction();
-        //Reemplazamos el Frame Layout de la Activity por el nuevo fragment.
-        //El Frame Layout es el contenedor
-        fragmentTransaction.replace(R.id.content_frame, new ProfileFragment());
-        fragmentTransaction.commit();
+        if (fragment == null) fragment = new ProfileFragment();
+        initFragment(fragment);
 
         // Anadir Toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -107,36 +101,34 @@ public class MainActivity extends AppCompatActivity {
                 // Check to see which item was being clicked and perform appropriate action
                 switch (menuItem.getItemId()) {
                     case R.id.menu_profile:
-                        Toast.makeText(context, "Profile selected", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, "Profile selected", Toast.LENGTH_SHORT).show();
+                        setTitle(getString(R.string.profile));
                         f = new ProfileFragment();
                         break;
 
                     case R.id.menu_music:
-                        Toast.makeText(context, "Music selected", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, "Music selected", Toast.LENGTH_SHORT).show();
                         f = new MusicFragment();
                         break;
 
                     case R.id.menu_game:
-                        Toast.makeText(context, "Game Selected", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, "Game Selected", Toast.LENGTH_SHORT).show();
                         f = new GameFragment();
                         break;
 
                     case R.id.menu_calculator:
-                        Toast.makeText(context, "Calculator Selected", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, "Calculator Selected", Toast.LENGTH_SHORT).show();
                         f = new CalculatorFragment();
                         break;
 
-                    case R.id.menu_settiongs:
-                        Toast.makeText(context, "Settings Selected", Toast.LENGTH_SHORT).show();
+                    case R.id.menu_settings:
+                        //Toast.makeText(context, "Settings Selected", Toast.LENGTH_SHORT).show();
                         break;
                 }
 
                 if (f != null) {
-                    FragmentManager fragmentManager = getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction =
-                            fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.content_frame, f);
-                    fragmentTransaction.commit();
+                    fragment = f;
+                    initFragment(f);
                 }
 
                 return true;
@@ -164,4 +156,83 @@ public class MainActivity extends AppCompatActivity {
         actionBarDrawerToggle.syncState();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outstate) {
+        super.onSaveInstanceState(outstate);
+
+        outstate.putString("fragmentTag", fragment.getTag());
+        Log.v(TAG, "Guardando fragment: " + fragment.getTag());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        String fragmentTag = savedInstanceState.getString("fragmentTag");
+        restoreFragment(fragmentTag);
+
+        Log.v(TAG, "Restableciendo fragment: " + fragmentTag);
+    }
+
+    private void restoreFragment(String fragmentTag) {
+        switch (fragmentTag) {
+            case "ProfileFragment":
+                //Toast.makeText(context, "Profile selected", Toast.LENGTH_SHORT).show();
+                setTitle(getString(R.string.profile));
+                if (fragment != null && !fragmentTag.equals(fragment.getTag()))
+                    fragment = new ProfileFragment();
+                break;
+
+            case "MusicFragment":
+                //Toast.makeText(context, "Music selected", Toast.LENGTH_SHORT).show();
+                setTitle(getString(R.string.music));
+                if (fragment != null && !fragmentTag.equals(fragment.getTag()))
+                    fragment = new MusicFragment();
+                break;
+
+            case "GameFragment":
+                //Toast.makeText(context, "Game Selected", Toast.LENGTH_SHORT).show();
+                setTitle(getString(R.string.game));
+                if (fragment != null && !fragmentTag.equals(fragment.getTag()))
+                    fragment = new GameFragment();
+                break;
+
+            case "CalculatorFragment":
+                //Toast.makeText(context, "Calculator Selected", Toast.LENGTH_SHORT).show();
+                setTitle(getString(R.string.calculator));
+                if (fragment != null && !fragmentTag.equals(fragment.getTag()))
+                    fragment = new CalculatorFragment();
+                break;
+
+            case "Settings":
+                //Toast.makeText(context, "Settings Selected", Toast.LENGTH_SHORT).show();
+                setTitle(getString(R.string.settings));
+                break;
+        }
+
+        initFragment(fragment);
+    }
+
+    private void initFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction =
+                fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.content_frame, fragment);
+        fragmentTransaction.commit();
+    }
 }

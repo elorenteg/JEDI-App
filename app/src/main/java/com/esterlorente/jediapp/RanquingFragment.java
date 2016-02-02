@@ -81,7 +81,7 @@ public class RanquingFragment extends Fragment {
         ArrayList<Score> scores;
 
         switch (id) {
-            case R.id.action_settings:
+            case R.id.settings:
                 Log.e(TAG, "ranquing");
                 return true;
             case R.id.num2:

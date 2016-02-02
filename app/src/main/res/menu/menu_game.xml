@@ -5,7 +5,8 @@
     <item
         android:id="@+id/numCards"
         android:icon="@drawable/burger"
-        android:title="@string/numCards">
+        android:title="@string/numCards"
+        app:showAsAction="ifRoom">
         <menu android:checkableBehavior="single">
             <item
                 android:id="@+id/num2"
@@ -24,19 +25,15 @@
 
     <item
         android:id="@+id/restart"
+        android:icon="@drawable/ic_autorenew_black_24dp"
         android:orderInCategory="100"
         android:title="@string/restart"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/logout"
+        android:icon="@drawable/burger"
         android:orderInCategory="100"
         android:title="@string/logout"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
 </menu>

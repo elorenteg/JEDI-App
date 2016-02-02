@@ -6,6 +6,8 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -18,7 +20,6 @@ public class GameFragment extends Fragment {
     private Context context;
     private View rootView;
     private LoginHelper loginHelper;
-
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -51,8 +52,8 @@ public class GameFragment extends Fragment {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
-        adapter.addFragment(new MemoryFragment(), getResources().getText(R.string.memoryTabname).toString());
-        adapter.addFragment(new RanquingFragment(), getResources().getText(R.string.ranquingTabname).toString());
+        adapter.addFragment(new MemoryFragment(), getResources().getText(R.string.memory).toString());
+        adapter.addFragment(new RanquingFragment(), getResources().getText(R.string.ranquing).toString());
         viewPager.setAdapter(adapter);
     }
 
@@ -64,5 +65,11 @@ public class GameFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_game, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 }

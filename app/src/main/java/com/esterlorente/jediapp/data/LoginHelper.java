@@ -142,7 +142,7 @@ public class LoginHelper extends SQLiteOpenHelper {
                 where,                                  // The values for the WHERE clause
                 null,                                   // don't group the rows
                 null,                                   // don't filter by row groups
-                null                                    // The sort order
+                SCORE + " DESC"                         // The sort order
         );
         return c;
     }

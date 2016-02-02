@@ -323,7 +323,7 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         ArrayList<Score> scores;
 
         switch (id) {
-            case R.id.action_settings:
+            case R.id.settings:
                 Log.e(TAG, "memory");
                 return true;
             case R.id.num2:
