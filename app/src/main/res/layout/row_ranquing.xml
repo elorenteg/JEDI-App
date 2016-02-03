@@ -2,8 +2,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingTop="10dp"
+    android:paddingRight="10dp"
+    android:paddingBottom="10dp"
+    android:paddingLeft="10dp">
 
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageUser"
+        android:src="@drawable/gato5"
+        android:maxHeight="20dp"
+        android:longClickable="true"
+        android:paddingRight="10dp" />
 
     <TextView
         android:layout_width="match_parent"
@@ -20,5 +34,6 @@
         android:text="4"
         android:id="@+id/textScore"
         android:textSize="20dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:paddingLeft="10dp" />
 </LinearLayout>

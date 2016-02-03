@@ -142,7 +142,23 @@ public class LoginHelper extends SQLiteOpenHelper {
                 where,                                  // The values for the WHERE clause
                 null,                                   // don't group the rows
                 null,                                   // don't filter by row groups
-                SCORE + " DESC"                         // The sort order
+                SCORE + " ASC"                         // The sort order
+        );
+        return c;
+    }
+
+    public Cursor getImageByUser(String username) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String[] columns = {IMAGE};
+        String[] where = {username};
+        Cursor c = db.query(
+                USER_TABLE,                            // The table to query
+                columns,                                // The columns to return
+                USERNAME + "=?", // The columns for the WHERE clause
+                where,                                  // The values for the WHERE clause
+                null,                                   // don't group the rows
+                null,                                   // don't filter by row groups
+                null                                    // The sort order
         );
         return c;
     }

@@ -4,6 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.esterlorente.jediapp.R;
@@ -96,6 +98,7 @@ public class MyCustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         *  llamaríamos a la referencia en el ViewHolder, ahorrándonos procesamiento.
         */
 
+        public ImageView image;
         public TextView username;
         public TextView score;
         public View v;
@@ -103,6 +106,7 @@ public class MyCustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public AdapterViewHolder(View itemView) {
             super(itemView);
             this.v = itemView;
+            this.image = (ImageView) itemView.findViewById(R.id.imageUser);
             this.username = (TextView) itemView.findViewById(R.id.textUser);
             this.score = (TextView) itemView.findViewById(R.id.textScore);
         }
@@ -120,6 +124,7 @@ public class MyCustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         *  llamaríamos a la referencia en el ViewHolder, ahorrándonos procesamiento.
         */
 
+        public ImageView image;
         public TextView username;
         public TextView score;
         public View v;
@@ -127,6 +132,7 @@ public class MyCustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public HeaderViewHolder(View itemView) {
             super(itemView);
             this.v = itemView;
+            this.image = (ImageView) itemView.findViewById(R.id.imageUser);
             this.username = (TextView) itemView.findViewById(R.id.headerUser);
             this.score = (TextView) itemView.findViewById(R.id.headerScore);
         }

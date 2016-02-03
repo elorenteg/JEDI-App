@@ -2,6 +2,10 @@ package com.esterlorente.jediapp;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,6 +20,7 @@ import com.esterlorente.jediapp.adapters.MyCustomAdapter;
 import com.esterlorente.jediapp.data.LoginHelper;
 import com.esterlorente.jediapp.utils.Score;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 
@@ -60,14 +65,47 @@ public class RanquingFragment extends Fragment {
             do {
                 String username = cursor.getString(cursor.getColumnIndex(loginHelper.USERNAME));
                 int score = cursor.getInt(cursor.getColumnIndex(loginHelper.SCORE));
-                Score scoreOBJ = new Score(username, score);
-                scores.add(scoreOBJ);
+                // TODO: Join tables
+                Cursor cursor1 = loginHelper.getImageByUser(username);
+                if (cursor1.moveToFirst()) {
+                    byte[] image = cursor1.getBlob(cursor1.getColumnIndex(loginHelper.IMAGE));
+                    if (image == null) {
+                        Bitmap bitmap = drawableToBitmap(getActivity().getDrawable(R.drawable.gato5));
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        image = stream.toByteArray();
+                    }
+                    Score scoreOBJ = new Score(image, username, score);
+                    scores.add(scoreOBJ);
+                }
             } while (cursor.moveToNext());
         }
 
         Log.e(TAG, "Scores " + scores.size());
 
         return scores;
+    }
+
+    public static Bitmap drawableToBitmap(Drawable drawable) {
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable) drawable).getBitmap();
+        }
+
+        final int width = !drawable.getBounds().isEmpty() ? drawable
+                .getBounds().width() : drawable.getIntrinsicWidth();
+
+        final int height = !drawable.getBounds().isEmpty() ? drawable
+                .getBounds().height() : drawable.getIntrinsicHeight();
+
+        final Bitmap bitmap = Bitmap.createBitmap(width <= 0 ? 1 : width,
+                height <= 0 ? 1 : height, Bitmap.Config.ARGB_8888);
+
+        Log.v("Bitmap width - Height :", width + " : " + height);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 
     @Override

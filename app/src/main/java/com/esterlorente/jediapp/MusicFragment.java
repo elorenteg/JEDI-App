@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.esterlorente.jediapp.data.LoginHelper;
@@ -25,6 +26,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
     private ImageView imageCover;
     private Button buttonPlay, buttonNext, buttonPrevious;
+    private ImageButton imagePlay, imageNext, imagePrevious;
     private MediaPlayer mediaPlayer;
 
     @Override
@@ -42,6 +44,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
     private void initView() {
         imageCover = (ImageView) rootView.findViewById(R.id.imageCover);
+
         buttonPlay = (Button) rootView.findViewById(R.id.buttonPlay);
         buttonNext = (Button) rootView.findViewById(R.id.buttonNext);
         buttonPrevious = (Button) rootView.findViewById(R.id.buttonPrevious);
@@ -49,6 +52,14 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
         buttonPlay.setOnClickListener(this);
         buttonNext.setOnClickListener(this);
         buttonPrevious.setOnClickListener(this);
+
+        imagePlay = (ImageButton) rootView.findViewById(R.id.imagePlay);
+        imageNext = (ImageButton) rootView.findViewById(R.id.imageNext);
+        imagePrevious = (ImageButton) rootView.findViewById(R.id.imagePrevious);
+
+        imagePlay.setOnClickListener(this);
+        imageNext.setOnClickListener(this);
+        imagePrevious.setOnClickListener(this);
     }
 
     private void initMediaPlayer() {
@@ -69,6 +80,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonPlay:
+            case R.id.imagePlay:
                 if (mediaPlayer.isPlaying()) {
                     buttonPlay.setText("Play");
                     mediaPlayer.pause();
@@ -78,8 +90,10 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
                 }
                 break;
             case R.id.buttonNext:
+            case R.id.imageNext:
                 break;
             case R.id.buttonPrevious:
+            case R.id.imagePrevious:
 
                 break;
         }
