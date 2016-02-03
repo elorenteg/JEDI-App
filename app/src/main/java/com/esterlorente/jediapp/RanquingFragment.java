@@ -60,24 +60,21 @@ public class RanquingFragment extends Fragment {
     private ArrayList<Score> getScoresByCard(int numCard) {
         ArrayList<Score> scores = new ArrayList();
 
-        Cursor cursor = loginHelper.getAllScoresByNumcard(numCard);
+        Cursor cursor = loginHelper.getAllScoresAndImagesByNumcard(numCard);
         if (cursor.moveToFirst()) {
             do {
                 String username = cursor.getString(cursor.getColumnIndex(loginHelper.USERNAME));
                 int score = cursor.getInt(cursor.getColumnIndex(loginHelper.SCORE));
-                // TODO: Join tables
-                Cursor cursor1 = loginHelper.getImageByUser(username);
-                if (cursor1.moveToFirst()) {
-                    byte[] image = cursor1.getBlob(cursor1.getColumnIndex(loginHelper.IMAGE));
-                    if (image == null) {
-                        Bitmap bitmap = drawableToBitmap(getActivity().getDrawable(R.drawable.gato5));
-                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                        image = stream.toByteArray();
-                    }
-                    Score scoreOBJ = new Score(image, username, score);
-                    scores.add(scoreOBJ);
+                byte[] image = cursor.getBlob(cursor.getColumnIndex(loginHelper.IMAGE));
+                if (image == null) {
+                    Bitmap bitmap = drawableToBitmap(getActivity().getDrawable(R.drawable.gato5));
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    image = stream.toByteArray();
                 }
+                Score scoreOBJ = new Score(image, username, score);
+                scores.add(scoreOBJ);
+
             } while (cursor.moveToNext());
         }
 
@@ -164,8 +161,8 @@ public class RanquingFragment extends Fragment {
             Log.e(TAG, "Restaurando datos");
 
             numCards = savedInstanceState.getInt("numCards");
+            initRanquing();
         }
-        initRanquing();
     }
 
     private void initRanquing() {

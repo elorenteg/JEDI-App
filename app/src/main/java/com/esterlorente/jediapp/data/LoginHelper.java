@@ -131,34 +131,18 @@ public class LoginHelper extends SQLiteOpenHelper {
                 values);
     }
 
-    public Cursor getAllScoresByNumcard(int numCards) {
+    public Cursor getAllScoresAndImagesByNumcard(int numCards) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String[] columns = {USERNAME, SCORE};
+        String[] columns = {"us." + USERNAME, IMAGE, SCORE};
         String[] where = {Integer.toString(numCards)};
         Cursor c = db.query(
-                SCORE_TABLE,                            // The table to query
+                USER_TABLE + " us " + ", " + SCORE_TABLE + " sc",                            // The table to query
                 columns,                                // The columns to return
-                NUMCARDS + "=?", // The columns for the WHERE clause
+                "us." + USERNAME + " = " + "sc." + USERNAME + " AND " + NUMCARDS + "=?", // The columns for the WHERE clause
                 where,                                  // The values for the WHERE clause
                 null,                                   // don't group the rows
                 null,                                   // don't filter by row groups
                 SCORE + " ASC"                         // The sort order
-        );
-        return c;
-    }
-
-    public Cursor getImageByUser(String username) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        String[] columns = {IMAGE};
-        String[] where = {username};
-        Cursor c = db.query(
-                USER_TABLE,                            // The table to query
-                columns,                                // The columns to return
-                USERNAME + "=?", // The columns for the WHERE clause
-                where,                                  // The values for the WHERE clause
-                null,                                   // don't group the rows
-                null,                                   // don't filter by row groups
-                null                                    // The sort order
         );
         return c;
     }

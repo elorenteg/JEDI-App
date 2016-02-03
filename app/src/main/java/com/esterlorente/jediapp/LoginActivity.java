@@ -105,7 +105,7 @@ public class LoginActivity extends AppCompatActivity {
                 // User exists
                 editName.setError(null);
 
-                String passSaved = cursor.getString(cursor.getColumnIndex("password"));
+                String passSaved = cursor.getString(cursor.getColumnIndex(loginHelper.PASSWORD));
                 if (!password.equals(passSaved)) {
                     editPass.setError("invalid password");
                     valid = false;

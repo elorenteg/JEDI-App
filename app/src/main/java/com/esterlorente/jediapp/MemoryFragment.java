@@ -39,8 +39,8 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
 
     private TextView textAttempts;
 
-    private int numCards = 4;
-    private int numPairsLeft = numCards * numCards / 2;
+    private int numCards;
+    private int numPairsLeft;
     private ArrayList<Integer> idsCards;
     private ArrayList<CardMemory> listCards;
     private Integer selCard;
@@ -64,6 +64,12 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         context = getContext();
         textAttempts = (TextView) rootView.findViewById(R.id.textAttempt);
 
+        if (savedInstanceState == null) {
+            Log.e(TAG, "Inicializando datos");
+            numCards = 4;
+            restartMemory(numCards);
+        }
+
         return rootView;
     }
 
@@ -74,7 +80,6 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
             public void run() {
                 int width = linearLayout.getWidth();
                 int height = linearLayout.getHeight();
-                Log.e(TAG, width + " " + height);
 
                 drawCards(width, height);
             }
@@ -197,7 +202,6 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
                             Cursor cursor = loginHelper.getUserScoreByName(username, numCards);
                             if (cursor.moveToFirst()) {
                                 int minAttemps = cursor.getInt(cursor.getColumnIndex(loginHelper.SCORE));
-                                Log.e(TAG, "MinAttemps " + minAttemps);
 
                                 if (minAttemps > score) {
                                     Log.e(TAG, "Mejora de marca!");
@@ -232,11 +236,11 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
 
     private void showEndGame() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(context)
-                .setTitle(getString(R.string.complete))//.setIcon(R.drawable.icon)
+                .setTitle(getString(R.string.complete)).setIcon(R.drawable.gato)
                 .setMessage(getString(R.string.alert_mss) + " " + textAttempts.getText())
                 .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Toast.makeText(context, "POS enter a text here", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, "POS enter a text here", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setCancelable(false);
@@ -296,9 +300,9 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        Log.e(TAG, "Restaurando datos");
-
         if (savedInstanceState != null) {
+            Log.e(TAG, "Restaurando datos");
+
             numCards = savedInstanceState.getInt("numCards");
             idsCards = (ArrayList) savedInstanceState.getIntegerArrayList("idsCards");
             listCards = (ArrayList) savedInstanceState.getParcelableArrayList("listCards");
@@ -307,22 +311,12 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
             textAttempts.setText(savedInstanceState.getString("numAttempts"));
 
             initCards();
-        } else {
-            if (listCards != null) {
-                Log.e(TAG, "Datos no-null");
-            } else {
-                Log.e(TAG, "Datos null, inicializando");
-                initCards();
-            }
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        ArrayList<Score> scores;
-
-        switch (id) {
+        switch (item.getItemId()) {
             case R.id.num2:
                 Log.e(TAG, "memory");
                 restartMemory(2);

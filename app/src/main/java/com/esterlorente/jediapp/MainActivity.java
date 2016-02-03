@@ -2,6 +2,7 @@ package com.esterlorente.jediapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
@@ -46,20 +47,11 @@ public class MainActivity extends AppCompatActivity {
 
         setTitle(getString(R.string.app_name));
 
-        /*
-        if (savedInstanceState == null) {
-            fragment = new ProfileFragment();
-            FRAGMENT_TAG = R.string.profile;
-            initFragment();
-        }
-        */
-
         if (savedInstanceState != null) {
             fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
         } else {
             fragment = new ProfileFragment();
             FRAGMENT_TAG = getString(R.string.profile);
-            Log.e(TAG, FRAGMENT_TAG);
             getSupportFragmentManager().beginTransaction().add(R.id.content_frame, fragment, FRAGMENT_TAG).commit();
         }
 
@@ -89,11 +81,11 @@ public class MainActivity extends AppCompatActivity {
         ImageView imageUsername = (ImageView) header.findViewById(R.id.navview_image);
         Cursor cursor = loginHelper.getUserImageByName(username);
         if (cursor.moveToFirst()) {
-            if (!cursor.isNull(0)) {
-                Log.e(TAG, "Cursor con fila y valor");
-                byte[] image = cursor.getBlob(1);
+            byte[] image = cursor.getBlob(cursor.getColumnIndex(loginHelper.IMAGE));
+            if (image != null) {
+                Log.e(TAG, "Usuario no dispone de imagen");
                 imageUsername.setImageBitmap(BitmapFactory.decodeByteArray(image, 0, image.length));
-            } else Log.e(TAG, "Cursor con fila, pero valor null");
+            }
         }
 
         // Setting Navigation View Item Selected Listener to handle the item click of the navigation menu
@@ -117,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
 
                 Fragment f = null;
                 int tag = -1;
-
 
                 // Check to see which item was being clicked and perform appropriate action
                 switch (menuItem.getItemId()) {
@@ -147,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
                     setTitle(FRAGMENT_TAG);
                     initFragment();
                 }
-
 
                 return true;
             }
@@ -195,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void logoutUser() {
-        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
+        SharedPreferences pref = context.getSharedPreferences("MyPref", context.MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.remove("key_username");
         editor.commit();
@@ -226,11 +216,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void restoreFragment(Bundle savedInstanceState) {
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
 
         if (savedInstanceState != null) {
-            fragment = (Fragment) manager.getFragment(savedInstanceState, FRAGMENT_TAG);
+            fragment = fragmentManager.getFragment(savedInstanceState, FRAGMENT_TAG);
         } else {
             fragment = new ProfileFragment();
             transaction.add(R.id.content_frame, fragment, FRAGMENT_TAG);
@@ -241,7 +231,15 @@ public class MainActivity extends AppCompatActivity {
     private void initFragment() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content_frame, fragment, FRAGMENT_TAG.toString());
+        fragmentTransaction.replace(R.id.content_frame, fragment, FRAGMENT_TAG);
         fragmentTransaction.commit();
+    }
+
+    public void startBindService(Intent intent, ServiceConnection mConnection, int bindAutoCreate) {
+        bindService(intent, mConnection, bindAutoCreate);
+    }
+
+    public void unBindService(ServiceConnection mConnection) {
+        unbindService(mConnection);
     }
 }

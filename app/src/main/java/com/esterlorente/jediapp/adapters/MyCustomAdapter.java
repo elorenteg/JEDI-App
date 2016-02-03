@@ -41,7 +41,6 @@ public class MyCustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (viewType == TYPE_HEADER) {
             View view = inflater.inflate(R.layout.header_ranquing, viewGroup, false);
             HeaderViewHolder adapterViewHolder = new HeaderViewHolder(view);
-            //adapterViewHolder.setHeader();
             return adapterViewHolder;
         } else if (viewType == TYPE_ITEM) {
             View view = inflater.inflate(R.layout.row_ranquing, viewGroup, false);
@@ -109,10 +108,6 @@ public class MyCustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             this.image = (ImageView) itemView.findViewById(R.id.imageUser);
             this.username = (TextView) itemView.findViewById(R.id.textUser);
             this.score = (TextView) itemView.findViewById(R.id.textScore);
-        }
-
-        public void setHeader() {
-            username.setTextSize(40);
         }
     }
 
