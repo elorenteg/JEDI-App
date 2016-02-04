@@ -175,4 +175,22 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
         PendingIntent test = PendingIntent.getActivity(context, NOTIFICATION_ID, notificationIntent, PendingIntent.FLAG_NO_CREATE);
         return test != null;
     }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outstate) {
+        super.onSaveInstanceState(outstate);
+
+        outstate.putString("title", getActivity().getTitle().toString());
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            getActivity().setTitle(savedInstanceState.getString("title"));
+        }
+    }
+
 }

@@ -3,7 +3,6 @@ package com.esterlorente.jediapp;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,6 +34,8 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
     private View rootView;
     private LoginHelper loginHelper;
 
+    private String username;
+
     private TextView textAttempts;
 
     private int numCards;
@@ -58,6 +59,11 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         rootView = inflater.inflate(R.layout.fragment_memory, container, false);
 
         setHasOptionsMenu(true);
+
+        Bundle args = this.getArguments();
+        if (args != null) {
+            username = args.getString("username");
+        }
 
         context = getContext();
         textAttempts = (TextView) rootView.findViewById(R.id.textAttempt);
@@ -193,9 +199,6 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
                         if (numPairsLeft == 0) {
                             Log.e(TAG, "Final del juego!!");
 
-                            SharedPreferences pref = context.getSharedPreferences("MyPref", Context.MODE_PRIVATE);
-                            String username = pref.getString("key_username", null);
-
                             loginHelper = new LoginHelper(context);
                             Cursor cursor = loginHelper.getUserScoreByName(username, numCards);
                             if (cursor.moveToFirst()) {
@@ -236,10 +239,15 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
     private void showEndGame() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(context)
                 .setTitle(getString(R.string.complete)).setIcon(R.drawable.gato)
-                .setMessage(getString(R.string.alert_mss) + " " + textAttempts.getText())
-                .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                .setMessage(getString(R.string.alert_mss) + " " + textAttempts.getText() + "\n" +
+                        getString(R.string.newGame))
+                .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        //Toast.makeText(context, "POS enter a text here", Toast.LENGTH_SHORT).show();
+                        restartMemory(numCards);
+                    }
+                })
+                .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
                     }
                 })
                 .setCancelable(false);
@@ -316,22 +324,6 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.num2:
-                Log.e(TAG, "memory");
-                restartMemory(2);
-                return true;
-            case R.id.num4:
-                Log.e(TAG, "memory");
-                restartMemory(4);
-                return true;
-            case R.id.num6:
-                Log.e(TAG, "memory");
-                restartMemory(6);
-                return true;
-            case R.id.num8:
-                Log.e(TAG, "memory");
-                restartMemory(8);
-                return true;
             case R.id.restart:
                 restartMemory(numCards);
                 return true;

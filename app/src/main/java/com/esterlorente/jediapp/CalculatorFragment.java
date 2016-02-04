@@ -69,15 +69,17 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
         super.onSaveInstanceState(outstate);
 
         outstate.putString("textOper", textOper.getText().toString());
-        Log.v(TAG, "Guardando textOper: " + textOper.getText().toString());
-
         outstate.putString("textRes", textRes.getText().toString());
-        Log.v(TAG, "Guardando textRes: " + textRes.getText().toString());
+        outstate.putString("title", getActivity().getTitle().toString());
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            getActivity().setTitle(savedInstanceState.getString("title"));
+        }
 
         /*
         if (savedInstanceState != null) {

@@ -67,21 +67,17 @@ public class RanquingFragment extends Fragment {
                 int score = cursor.getInt(cursor.getColumnIndex(loginHelper.SCORE));
                 byte[] image = cursor.getBlob(cursor.getColumnIndex(loginHelper.IMAGE));
                 if (image == null) {
-                    Log.e(TAG, "imagen null");
                     Bitmap bitmap = drawableToBitmap(getActivity().getDrawable(R.drawable.gato5));
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                     image = stream.toByteArray();
-                } else {
-                    Log.e(TAG, "imagen no-null");
                 }
                 Score scoreOBJ = new Score(image, username, score);
                 scores.add(scoreOBJ);
 
             } while (cursor.moveToNext());
         }
-
-        Log.e(TAG, "Scores " + scores.size());
+        cursor.close();
 
         return scores;
     }
@@ -100,7 +96,6 @@ public class RanquingFragment extends Fragment {
         final Bitmap bitmap = Bitmap.createBitmap(width <= 0 ? 1 : width,
                 height <= 0 ? 1 : height, Bitmap.Config.ARGB_8888);
 
-        Log.v("Bitmap width - Height :", width + " : " + height);
         Canvas canvas = new Canvas(bitmap);
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
@@ -111,36 +106,12 @@ public class RanquingFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        ArrayList<Score> scores;
+
 
         switch (id) {
-            case R.id.num2:
-                Log.e(TAG, "ranquing");
-                numCards = 2;
-                scores = getScoresByCard(numCards);
-                adapter.changeData(scores);
-                return true;
-            case R.id.num4:
-                Log.e(TAG, "ranquing");
-                numCards = 4;
-                scores = getScoresByCard(numCards);
-                adapter.changeData(scores);
-                return true;
-            case R.id.num6:
-                Log.e(TAG, "ranquing");
-                numCards = 6;
-                scores = getScoresByCard(numCards);
-                adapter.changeData(scores);
-                return true;
-            case R.id.num8:
-                Log.e(TAG, "ranquing");
-                numCards = 8;
-                scores = getScoresByCard(numCards);
-                adapter.changeData(scores);
-                return true;
             case R.id.restart:
-                scores = getScoresByCard(numCards);
-                adapter.changeData(scores);
+                ArrayList<Score> emptyScores = new ArrayList();
+                adapter.changeData(emptyScores);
                 return true;
         }
 

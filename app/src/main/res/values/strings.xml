@@ -44,5 +44,8 @@
     <string name="closeDrawer">Close Drawer</string>
     <string name="change">Change</string>
     <string name="reproduce_music">Reproducing music</string>
+    <string name="newGame">Do you want to restart the game?</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
 
 </resources>

@@ -24,7 +24,7 @@ import android.widget.TextView;
 
 import com.esterlorente.jediapp.data.LoginHelper;
 
-public class MainActivity extends AppCompatActivity implements OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity {
     private String TAG = "MAIN_ACTIVITY";
 
     private String FRAGMENT_TAG;
@@ -140,6 +140,10 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 }
 
                 if (f != null) {
+                    Bundle b = new Bundle();
+                    b.putString("username", username);
+                    f.setArguments(b);
+
                     fragment = f;
                     FRAGMENT_TAG = getString(tag);
                     setTitle(FRAGMENT_TAG);
@@ -228,6 +232,8 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
+        setTitle(FRAGMENT_TAG);
+
         if (savedInstanceState != null) {
             fragment = fragmentManager.getFragment(savedInstanceState, FRAGMENT_TAG);
         } else {
@@ -241,6 +247,8 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     }
 
     private void initFragment() {
+        setTitle(FRAGMENT_TAG);
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.content_frame, fragment, FRAGMENT_TAG);
@@ -253,23 +261,5 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
 
     public void unBindService(ServiceConnection mConnection) {
         unbindService(mConnection);
-    }
-
-    @Override
-    public void onFragmentInteraction(String text, Integer from) {
-        Fragment f = null;
-
-
-        //Creamos un bundle con el text recibido del fragment
-        Bundle b = new Bundle();
-        b.putString("message", text);
-        //Añadimos el Bundle al nuevo fragment
-        f.setArguments(b);
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction =
-                fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content_frame, f);
-        fragmentTransaction.commit();
     }
 }

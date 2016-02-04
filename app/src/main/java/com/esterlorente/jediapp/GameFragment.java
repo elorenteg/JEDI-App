@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -54,8 +55,19 @@ public class GameFragment extends Fragment implements ViewPager.OnPageChangeList
     }
 
     private void setupViewPager(ViewPager viewPager) {
+        Bundle args = this.getArguments();
+        String username = null;
+        if (args != null) {
+            username = args.getString("username");
+        }
+        Bundle b = new Bundle();
+        b.putString("username", username);
+
+        MemoryFragment memoryFragment = new MemoryFragment();
+        memoryFragment.setArguments(b);
+
         MyViewPagerAdapter adapter = new MyViewPagerAdapter(getChildFragmentManager());
-        adapter.addFragment(new MemoryFragment(), getResources().getText(R.string.memory).toString());
+        adapter.addFragment(memoryFragment, getResources().getText(R.string.memory).toString());
         adapter.addFragment(new RanquingFragment(), getResources().getText(R.string.ranquing).toString());
         viewPager.setAdapter(adapter);
     }
@@ -63,11 +75,22 @@ public class GameFragment extends Fragment implements ViewPager.OnPageChangeList
     @Override
     public void onSaveInstanceState(Bundle outstate) {
         super.onSaveInstanceState(outstate);
+
+        Log.e(TAG, "Guardando datos");
+        outstate.putInt("numCards", numCards);
+        outstate.putString("title", getActivity().getTitle().toString());
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            Log.e(TAG, "Restaurando datos");
+
+            numCards = savedInstanceState.getInt("numCards");
+            getActivity().setTitle(savedInstanceState.getString("title"));
+        }
     }
 
     @Override
@@ -81,7 +104,7 @@ public class GameFragment extends Fragment implements ViewPager.OnPageChangeList
         MyViewPagerAdapter adapter = (MyViewPagerAdapter) viewPager.getAdapter();
         switch (position) {
             case 1:
-                ((RanquingFragment) adapter.getItem(position)).refresh(numCards);
+                //((RanquingFragment) adapter.getItem(position)).refresh(numCards);
                 break;
         }
     }
@@ -91,7 +114,7 @@ public class GameFragment extends Fragment implements ViewPager.OnPageChangeList
         MyViewPagerAdapter adapter = (MyViewPagerAdapter) viewPager.getAdapter();
         switch (position) {
             case 1:
-                ((RanquingFragment) adapter.getItem(position)).refresh(numCards);
+                //((RanquingFragment) adapter.getItem(position)).refresh(numCards);
                 break;
         }
     }
@@ -104,45 +127,19 @@ public class GameFragment extends Fragment implements ViewPager.OnPageChangeList
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.num2:
-                if (numCards != 2) {
-                    numCards = 2;
-                    refreshFragment();
-                }
+                numCards = 2;
                 return true;
             case R.id.num4:
-                if (numCards != 4) {
-                    numCards = 4;
-                    refreshFragment();
-                }
+                numCards = 4;
                 return true;
             case R.id.num6:
-                if (numCards != 6) {
-                    numCards = 6;
-                    refreshFragment();
-                }
+                numCards = 6;
                 return true;
             case R.id.num8:
-                if (numCards != 8) {
-                    numCards = 8;
-                    refreshFragment();
-                }
+                numCards = 8;
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void refreshFragment() {
-        MyViewPagerAdapter adapter = (MyViewPagerAdapter) viewPager.getAdapter();
-        int position = tabLayout.getSelectedTabPosition();
-        switch (position) {
-            case 0:
-                ((MemoryFragment) adapter.getItem(position)).restartMemory(numCards);
-                break;
-            case 1:
-                ((MemoryFragment) adapter.getItem(position - 1)).restartMemory(numCards);
-                ((RanquingFragment) adapter.getItem(position)).refresh(numCards);
-                break;
-        }
     }
 }

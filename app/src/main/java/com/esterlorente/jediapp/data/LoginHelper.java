@@ -53,7 +53,7 @@ public class LoginHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getUserByName(String username) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
         String[] columns = {USERNAME, PASSWORD};
         String[] where = {username};
         Cursor c = db.query(
@@ -69,7 +69,7 @@ public class LoginHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getUserImageByName(String username) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
         String[] columns = {IMAGE};
         String[] where = {username};
         Cursor c = db.query(
@@ -97,7 +97,7 @@ public class LoginHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getUserScoreByName(String username, int numCards) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
         String[] columns = {SCORE};
         String[] where = {username, Integer.toString(numCards)};
         Cursor c = db.query(
@@ -132,7 +132,7 @@ public class LoginHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getAllScoresAndImagesByNumcard(int numCards) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
         String[] columns = {"us." + USERNAME, IMAGE, SCORE};
         String[] where = {Integer.toString(numCards)};
         Cursor c = db.query(
@@ -159,7 +159,7 @@ public class LoginHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getScoresByName(String username) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
         String[] columns = {SCORE, NUMCARDS};
         String[] where = {username};
         Cursor c = db.query(
