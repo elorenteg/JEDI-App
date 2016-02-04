@@ -4,15 +4,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.esterlorente.jediapp.R;
 import com.esterlorente.jediapp.utils.ImageParser;
 import com.esterlorente.jediapp.utils.Score;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 

@@ -96,7 +96,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
             case R.id.imagePlay:
 
                 if (bound) {
-                    if (mService.mediaPlayer.isPlaying()) {
+                    if (mService.isPlaying()) {
                         buttonPlay.setText("Play");
                         mService.pause();
                     } else {

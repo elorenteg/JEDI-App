@@ -4,7 +4,6 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -40,6 +39,8 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
     private static final int GALLERY_REQUEST = 100;
     private static final int PIC_CROP = 1;
 
+    private String username;
+
     private View rootview;
     private Context context;
     private LoginHelper loginHelper;
@@ -54,6 +55,9 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
     private LocationManager lm;
     private LocationListener lis;
 
+    public ProfileFragment() {
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +71,11 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         loginHelper = new LoginHelper(context);
         setHasOptionsMenu(true);
 
+        Bundle args = this.getArguments();
+        if (args != null) {
+            username = args.getString("username");
+        }
+
         initButtons();
         initProfile();
 
@@ -74,13 +83,14 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
     }
 
     private void initProfile() {
-        SharedPreferences pref = context.getSharedPreferences("MyPref", Context.MODE_PRIVATE);
-        String username = pref.getString("key_username", null);
         textUsername.setText(username);
 
         Cursor cursor1 = loginHelper.getUserImageByName(username);
         if (cursor1.moveToFirst()) {
-            imageProfile.setImageBitmap(ImageParser.byteArrayToBitmap(cursor1.getBlob(cursor1.getColumnIndex(loginHelper.IMAGE))));
+            byte[] image = cursor1.getBlob(cursor1.getColumnIndex(loginHelper.IMAGE));
+            if (image != null) {
+                imageProfile.setImageBitmap(ImageParser.byteArrayToBitmap(image));
+            }
         }
 
         Cursor cursor2 = loginHelper.getScoresByName(username);
@@ -301,20 +311,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
             }
         };
 
-        /*
-        if (((MainActivity) getActivity()).checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ((MainActivity) getActivity()).checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    public void requestPermissions(@NonNull String[] permissions, int requestCode)
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for Activity#requestPermissions for more details.
-            return;
-        }
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, lis);
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, lis);
-        */
     }
 }

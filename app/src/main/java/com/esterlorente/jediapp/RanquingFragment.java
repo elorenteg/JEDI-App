@@ -188,5 +188,10 @@ public class RanquingFragment extends Fragment {
         mRecyclerView.setAdapter(adapter);
     }
 
-
+    public void refresh(int numCards) {
+        Log.e(TAG, "Refresh");
+        this.numCards = numCards;
+        ArrayList<Score> scores = getScoresByCard(numCards);
+        adapter.changeData(scores);
+    }
 }

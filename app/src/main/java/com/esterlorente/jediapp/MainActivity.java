@@ -24,10 +24,9 @@ import android.widget.TextView;
 
 import com.esterlorente.jediapp.data.LoginHelper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnFragmentInteractionListener {
     private String TAG = "MAIN_ACTIVITY";
 
-    private int FRAGMENT_TAG_INT;
     private String FRAGMENT_TAG;
     private Fragment fragment;
 
@@ -45,12 +44,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setTitle(getString(R.string.app_name));
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            username = bundle.getString("username");
+        }
 
         if (savedInstanceState != null) {
+            setTitle(FRAGMENT_TAG);
             fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
         } else {
+            setTitle(getString(R.string.profile));
+
+            Bundle b = new Bundle();
+            b.putString("username", username);
             fragment = new ProfileFragment();
+            fragment.setArguments(b);
+
             FRAGMENT_TAG = getString(R.string.profile);
             getSupportFragmentManager().beginTransaction().add(R.id.content_frame, fragment, FRAGMENT_TAG).commit();
         }
@@ -61,11 +70,6 @@ public class MainActivity extends AppCompatActivity {
 
         context = getApplicationContext();
         loginHelper = new LoginHelper(context);
-
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
-            username = bundle.getString("username");
-        }
 
         initNavigationDrawer();
     }
@@ -113,7 +117,10 @@ public class MainActivity extends AppCompatActivity {
                 // Check to see which item was being clicked and perform appropriate action
                 switch (menuItem.getItemId()) {
                     case R.id.menu_profile:
+                        Bundle b = new Bundle();
+                        b.putString("username", username);
                         f = new ProfileFragment();
+                        f.setArguments(b);
                         tag = R.string.profile;
                         break;
                     case R.id.menu_music:
@@ -199,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outstate);
 
         outstate.putString("fragmentTag", FRAGMENT_TAG);
+        outstate.putString("username", username);
         Log.v(TAG, "Guardando fragment: " + FRAGMENT_TAG);
 
         FragmentManager manager = getSupportFragmentManager();
@@ -210,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
 
         FRAGMENT_TAG = savedInstanceState.getString("fragmentTag");
+        username = savedInstanceState.getString("username");
         Log.v(TAG, "Restableciendo fragment: " + FRAGMENT_TAG);
 
         restoreFragment(savedInstanceState);
@@ -222,7 +231,10 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             fragment = fragmentManager.getFragment(savedInstanceState, FRAGMENT_TAG);
         } else {
+            Bundle b = new Bundle();
+            b.putString("username", username);
             fragment = new ProfileFragment();
+            fragment.setArguments(b);
             transaction.add(R.id.content_frame, fragment, FRAGMENT_TAG);
             transaction.commit();
         }
@@ -243,7 +255,21 @@ public class MainActivity extends AppCompatActivity {
         unbindService(mConnection);
     }
 
-    public boolean checkSelfPermission(int permission) {
-        return checkSelfPermission(permission);
+    @Override
+    public void onFragmentInteraction(String text, Integer from) {
+        Fragment f = null;
+
+
+        //Creamos un bundle con el text recibido del fragment
+        Bundle b = new Bundle();
+        b.putString("message", text);
+        //Añadimos el Bundle al nuevo fragment
+        f.setArguments(b);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction =
+                fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.content_frame, f);
+        fragmentTransaction.commit();
     }
 }

@@ -52,6 +52,9 @@ public class MediaPlayerService extends Service {
         return START_STICKY;
     }
 
+    public boolean isPlaying() {
+        return mediaPlayer.isPlaying();
+    }
 
     public void play() {
         if (!mediaPlayer.isPlaying()) {
@@ -64,6 +67,7 @@ public class MediaPlayerService extends Service {
             mediaPlayer.stop();
         }
         mediaPlayer.release();
+        mediaPlayer = null;
     }
 
     public void pause() {

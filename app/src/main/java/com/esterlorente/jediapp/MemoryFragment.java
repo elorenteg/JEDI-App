@@ -204,6 +204,7 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
                                 if (minAttemps > score) {
                                     Log.e(TAG, "Mejora de marca!");
                                     updateScore(username, numCards, score);
+                                    //notifyDataSetChanged();
                                 } else {
                                     Log.e(TAG, "No mejora :(");
                                 }
@@ -339,7 +340,7 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         return super.onOptionsItemSelected(item);
     }
 
-    private void restartMemory(int numCards) {
+    public void restartMemory(int numCards) {
         this.numCards = numCards;
         numPairsLeft = numCards * numCards / 2;
         textAttempts.setText("0");
