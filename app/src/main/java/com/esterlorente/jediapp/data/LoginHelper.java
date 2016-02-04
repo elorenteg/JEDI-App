@@ -146,4 +146,31 @@ public class LoginHelper extends SQLiteOpenHelper {
         );
         return c;
     }
+
+    public void updateImageByName(ContentValues values, String username) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String[] where = {username};
+        db.update(
+                USER_TABLE,                             // The table to query
+                values,                                 // The new column values
+                USERNAME + "=?",                        // The columns for the WHERE clause
+                where                                   // The values for the WHERE clause
+        );
+    }
+
+    public Cursor getScoresByName(String username) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String[] columns = {SCORE, NUMCARDS};
+        String[] where = {username};
+        Cursor c = db.query(
+                SCORE_TABLE,                            // The table to query
+                columns,                                // The columns to return
+                USERNAME + "=?",                        // The columns for the WHERE clause
+                where,                                  // The values for the WHERE clause
+                null,                                   // don't group the rows
+                null,                                   // don't filter by row groups
+                null                                    // The sort order
+        );
+        return c;
+    }
 }

@@ -18,11 +18,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.esterlorente.jediapp.data.LoginHelper;
 import com.esterlorente.jediapp.utils.CardMemory;
-import com.esterlorente.jediapp.utils.Score;
 
 import java.util.ArrayList;
 import java.util.Arrays;

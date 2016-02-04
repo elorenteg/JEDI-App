@@ -9,7 +9,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.esterlorente.jediapp.R;
+import com.esterlorente.jediapp.utils.ImageParser;
 import com.esterlorente.jediapp.utils.Score;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -56,11 +59,13 @@ public class MyCustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             HeaderViewHolder headerHolder = (HeaderViewHolder) adapterViewholder;
             headerHolder.username.setText("Username");
             headerHolder.score.setText("Score");
+            headerHolder.image.setText("Image");
         } else if (adapterViewholder instanceof AdapterViewHolder) {
             AdapterViewHolder rowViewHolder = (AdapterViewHolder) adapterViewholder;
             Score score = getItem(position);
             rowViewHolder.username.setText(score.getUsername());
             rowViewHolder.score.setText(String.valueOf(score.getScore()));
+            rowViewHolder.image.setImageBitmap(ImageParser.byteArrayToBitmap(score.getImage()));
         }
     }
 
@@ -119,7 +124,7 @@ public class MyCustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         *  llamaríamos a la referencia en el ViewHolder, ahorrándonos procesamiento.
         */
 
-        public ImageView image;
+        public TextView image;
         public TextView username;
         public TextView score;
         public View v;
@@ -127,7 +132,7 @@ public class MyCustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public HeaderViewHolder(View itemView) {
             super(itemView);
             this.v = itemView;
-            this.image = (ImageView) itemView.findViewById(R.id.imageUser);
+            this.image = (TextView) itemView.findViewById(R.id.headerImage);
             this.username = (TextView) itemView.findViewById(R.id.headerUser);
             this.score = (TextView) itemView.findViewById(R.id.headerScore);
         }

@@ -242,4 +242,8 @@ public class MainActivity extends AppCompatActivity {
     public void unBindService(ServiceConnection mConnection) {
         unbindService(mConnection);
     }
+
+    public boolean checkSelfPermission(int permission) {
+        return checkSelfPermission(permission);
+    }
 }

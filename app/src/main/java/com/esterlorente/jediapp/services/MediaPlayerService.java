@@ -13,11 +13,24 @@ import java.io.File;
 import java.io.IOException;
 
 public class MediaPlayerService extends Service {
+    private String TAG = "MEDIA_PLAYER_SERVICE";
     private final IBinder mBinder = new MediaPlayerBinder();
 
     public static MediaPlayer mediaPlayer = new MediaPlayer();
 
     public MediaPlayerService() {
+    }
+
+    public void onCreate() {
+        File sdCard = Environment.getExternalStorageDirectory();
+        File song = new File(sdCard.getAbsolutePath() + "/Music/song.mp3");
+
+        try {
+            mediaPlayer.setDataSource(song.getAbsolutePath());
+            mediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public class MediaPlayerBinder extends Binder {
@@ -29,25 +42,34 @@ public class MediaPlayerService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        Log.e(TAG, "onBind called");
         return mBinder;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.e(TAG, "Service started byt startService");
+        return START_STICKY;
     }
 
 
     public void play() {
-        File sdCard = Environment.getExternalStorageDirectory();
-        File song = new File(sdCard.getAbsolutePath() + "/Music/song.mp3");
-
-        try {
-            mediaPlayer.setDataSource(song.getAbsolutePath());
-            mediaPlayer.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!mediaPlayer.isPlaying()) {
+            mediaPlayer.start();
         }
-        mediaPlayer.start();
     }
 
     public void stop() {
-        mediaPlayer.stop();
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.stop();
+        }
+        mediaPlayer.release();
+    }
+
+    public void pause() {
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+        }
     }
 
 }

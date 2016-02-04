@@ -1,16 +1,16 @@
 package com.esterlorente.jediapp;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +20,6 @@ import android.widget.ImageView;
 
 import com.esterlorente.jediapp.data.LoginHelper;
 import com.esterlorente.jediapp.services.MediaPlayerService;
-
-import java.io.File;
-import java.io.IOException;
 
 public class MusicFragment extends Fragment implements View.OnClickListener {
     private String TAG = "MUSIC_FRAGMENT";
@@ -35,8 +32,9 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
     private ImageButton imagePlay, imageNext, imagePrevious;
     //private MediaPlayer mediaPlayer;
 
-    MediaPlayerService mService;
-    boolean bound = false;
+    private MediaPlayerService mService;
+    private boolean bound = false;
+    private int NOTIFICATION_ID = 1;
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -64,7 +62,6 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
         loginHelper = new LoginHelper(context);
         setHasOptionsMenu(true);
 
-        //initMediaPlayer();
         initView();
 
         return rootView;
@@ -92,22 +89,6 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
         imagePrevious.setOnClickListener(this);
     }
 
-    /*
-    private void initMediaPlayer() {
-        mediaPlayer = new MediaPlayer();
-        File sdCard = Environment.getExternalStorageDirectory();
-        Log.e(TAG, sdCard.getAbsolutePath());
-        File song = new File(sdCard.getAbsolutePath() + "/Music/song.mp3");
-
-        try {
-            mediaPlayer.setDataSource(song.getAbsolutePath());
-            mediaPlayer.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    */
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -115,28 +96,26 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
             case R.id.imagePlay:
 
                 if (bound) {
-                    mService.play();
+                    if (mService.mediaPlayer.isPlaying()) {
+                        buttonPlay.setText("Play");
+                        mService.pause();
+                    } else {
+                        buttonPlay.setText("Pause");
+                        mService.play();
+                        if (!isNotificationVisible()) sendNotification();
+                    }
                 }
-
-                /*
-                if (mediaPlayer.isPlaying()) {
-                    buttonPlay.setText("Play");
-                    //mediaPlayer.pause();
-                } else {
-                    buttonPlay.setText("Pause");
-                    mediaPlayer.start();
-                }
-                */
                 break;
             case R.id.buttonNext:
             case R.id.imageNext:
                 break;
             case R.id.buttonPrevious:
             case R.id.imagePrevious:
-
                 break;
             case R.id.buttonStop:
                 mService.stop();
+                buttonPlay.setText("Play");
+                deleteNotification();
                 break;
         }
     }
@@ -158,5 +137,42 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
             //unbindService(mConnection);
             bound = false;
         }
+    }
+
+    private void sendNotification() {
+        //Instanciamos Notification Manager
+        NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Para la notificaciones, en lugar de crearlas directamente, lo hacemos mediante
+        // un Builder/contructor.
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.reproduce_music));
+        // Creamos un intent explicito, para abrir la app desde nuestra notificación
+        Intent resultIntent = new Intent(context, MusicFragment.class);
+        //Generamos la backstack y le añadimos el intent
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        //Obtenemos el pending intent
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        mBuilder.setContentIntent(resultPendingIntent);
+
+        // mId es un identificador que nos permitirá actualizar la notificación
+        // más adelante
+        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+    }
+
+    private void deleteNotification() {
+        NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.cancel(NOTIFICATION_ID);
+    }
+
+    private boolean isNotificationVisible() {
+        Intent notificationIntent = new Intent(context, MainActivity.class);
+        PendingIntent test = PendingIntent.getActivity(context, NOTIFICATION_ID, notificationIntent, PendingIntent.FLAG_NO_CREATE);
+        return test != null;
     }
 }

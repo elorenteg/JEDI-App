@@ -15,7 +15,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/imageUser"
         android:src="@drawable/gato5"
-        android:maxHeight="20dp"
+        android:maxHeight="100dp"
+        android:maxWidth="100dp"
+        android:adjustViewBounds="true"
         android:longClickable="true"
         android:paddingRight="10dp" />
 
@@ -24,7 +26,7 @@
         android:layout_height="wrap_content"
         android:text="qwerty"
         android:id="@+id/textUser"
-        android:textSize="20dp"
+        android:textSize="16dp"
         android:textIsSelectable="false"
         android:layout_weight="1" />
 
@@ -33,7 +35,7 @@
         android:layout_height="wrap_content"
         android:text="4"
         android:id="@+id/textScore"
-        android:textSize="20dp"
+        android:textSize="16dp"
         android:layout_weight="1"
         android:paddingLeft="10dp" />
 </LinearLayout>

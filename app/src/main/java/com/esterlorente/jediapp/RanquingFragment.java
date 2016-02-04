@@ -67,10 +67,13 @@ public class RanquingFragment extends Fragment {
                 int score = cursor.getInt(cursor.getColumnIndex(loginHelper.SCORE));
                 byte[] image = cursor.getBlob(cursor.getColumnIndex(loginHelper.IMAGE));
                 if (image == null) {
+                    Log.e(TAG, "imagen null");
                     Bitmap bitmap = drawableToBitmap(getActivity().getDrawable(R.drawable.gato5));
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                     image = stream.toByteArray();
+                } else {
+                    Log.e(TAG, "imagen no-null");
                 }
                 Score scoreOBJ = new Score(image, username, score);
                 scores.add(scoreOBJ);
