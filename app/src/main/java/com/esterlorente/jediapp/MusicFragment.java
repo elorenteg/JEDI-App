@@ -30,7 +30,6 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
     private ImageView imageCover;
     private Button buttonPlay, buttonNext, buttonPrevious, buttonStop;
     private ImageButton imagePlay, imageNext, imagePrevious;
-    //private MediaPlayer mediaPlayer;
 
     private MediaPlayerService mService;
     private boolean bound = false;
@@ -63,6 +62,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
         setHasOptionsMenu(true);
 
         initView();
+
 
         return rootView;
     }
@@ -182,6 +182,12 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
         super.onSaveInstanceState(outstate);
 
         outstate.putString("title", getActivity().getTitle().toString());
+
+        outstate.putInt("Position", mService.mediaPlayer.getCurrentPosition());
+        outstate.putBoolean("isplaying", mService.mediaPlayer.isPlaying());
+
+        mService.mediaPlayer.stop();
+
     }
 
     @Override
@@ -190,7 +196,42 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
         if (savedInstanceState != null) {
             getActivity().setTitle(savedInstanceState.getString("title"));
+
+            int position = savedInstanceState.getInt("Position");
+            boolean isPlaying = savedInstanceState.getBoolean("isplaying");
+
+            startService(position, isPlaying);
+
         }
+    }
+
+    private void startService(final int position, final boolean isPlaying) {
+        mConnection = new ServiceConnection() {
+
+            @Override
+            public void onServiceConnected(ComponentName className,
+                                           IBinder service) {
+                // We've bound to LocalService, cast the IBinder and get LocalService instance
+                MediaPlayerService.MediaPlayerBinder binder = (MediaPlayerService.MediaPlayerBinder) service;
+
+                mService = binder.getService();
+                mService.initMediaPlayer();
+                mService.mediaPlayer.seekTo(position);
+                if (isPlaying) {
+                    mService.mediaPlayer.start();
+                    buttonPlay.setText("Pause");
+                }
+
+                bound = true;
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName arg0) {
+                bound = false;
+            }
+        };
+
+
     }
 
 }

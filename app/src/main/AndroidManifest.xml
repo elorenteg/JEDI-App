@@ -29,7 +29,11 @@
         <activity android:name=".SignupActivity" />
         <activity android:name=".MainActivity" />
 
-        <service android:name=".services.MediaPlayerService" />
+        <service android:name=".services.MediaPlayerService">
+            <intent-filter>
+                <action android:name="BOUNDSERVICE"></action>
+            </intent-filter>
+        </service>
 
     </application>
 

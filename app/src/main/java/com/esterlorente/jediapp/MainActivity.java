@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
+        //super.onSaveInstanceState(savedInstanceState);
 
         FRAGMENT_TAG = savedInstanceState.getString("fragmentTag");
         username = savedInstanceState.getString("username");
@@ -256,10 +256,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startBindService(Intent intent, ServiceConnection mConnection, int bindAutoCreate) {
+        Log.e(TAG, "Bind Service");
         bindService(intent, mConnection, bindAutoCreate);
     }
 
     public void unBindService(ServiceConnection mConnection) {
+        Log.e(TAG, "Unbind Service");
         unbindService(mConnection);
     }
 }
