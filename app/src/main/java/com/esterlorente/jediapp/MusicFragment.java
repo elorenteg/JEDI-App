@@ -21,6 +21,8 @@ import android.widget.ImageView;
 import com.esterlorente.jediapp.data.LoginHelper;
 import com.esterlorente.jediapp.services.MediaPlayerService;
 
+import java.io.Serializable;
+
 public class MusicFragment extends Fragment implements View.OnClickListener {
     private String TAG = "MUSIC_FRAGMENT";
     private Context context;
@@ -183,11 +185,10 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
         outstate.putString("title", getActivity().getTitle().toString());
 
-        outstate.putInt("Position", mService.mediaPlayer.getCurrentPosition());
-        outstate.putBoolean("isplaying", mService.mediaPlayer.isPlaying());
+        outstate.putInt("Position", mService.getTimeMedia());
+        outstate.putBoolean("isplaying", mService.isPlaying());
 
-        mService.mediaPlayer.stop();
-
+        mService.stop();
     }
 
     @Override
@@ -201,7 +202,6 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
             boolean isPlaying = savedInstanceState.getBoolean("isplaying");
 
             startService(position, isPlaying);
-
         }
     }
 
@@ -216,9 +216,9 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
                 mService = binder.getService();
                 mService.initMediaPlayer();
-                mService.mediaPlayer.seekTo(position);
+                mService.setTimeMedia(position);
                 if (isPlaying) {
-                    mService.mediaPlayer.start();
+                    mService.play();
                     buttonPlay.setText("Pause");
                 }
 
@@ -230,7 +230,6 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
                 bound = false;
             }
         };
-
 
     }
 

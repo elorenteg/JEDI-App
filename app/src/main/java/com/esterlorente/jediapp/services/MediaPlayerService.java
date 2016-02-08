@@ -17,7 +17,7 @@ public class MediaPlayerService extends Service {
     private String TAG = "MEDIA_PLAYER_SERVICE";
     private final IBinder mBinder = new MediaPlayerBinder();
 
-    public static MediaPlayer mediaPlayer;
+    private static MediaPlayer mediaPlayer;
 
     public MediaPlayerService() {
     }
