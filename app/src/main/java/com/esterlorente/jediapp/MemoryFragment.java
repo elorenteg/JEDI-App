@@ -34,9 +34,9 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
     private View rootView;
     private LoginHelper loginHelper;
 
-    private String username;
+    public String username;
 
-    private TextView textAttempts;
+    public TextView textAttempts;
 
     private int numCards;
     private int numPairsLeft;
@@ -68,7 +68,7 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         context = getContext();
         textAttempts = (TextView) rootView.findViewById(R.id.textAttempt);
 
-        if (savedInstanceState == null) {
+        if (savedInstanceState == null && args != null && args.getBoolean("first")) {
             Log.e(TAG, "Inicializando datos");
             numCards = 4;
             restartMemory(numCards);
@@ -291,7 +291,7 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onSaveInstanceState(Bundle outstate) {
-        super.onSaveInstanceState(outstate);
+        //super.onSaveInstanceState(outstate);
 
         Log.e(TAG, "Guardando datos");
 

@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         if (cursor.moveToFirst()) {
             byte[] image = cursor.getBlob(cursor.getColumnIndex(loginHelper.IMAGE));
             if (image != null) {
-                Log.e(TAG, "Usuario no dispone de imagen");
+                //Log.e(TAG, "Usuario no dispone de imagen");
                 imageUsername.setImageBitmap(BitmapFactory.decodeByteArray(image, 0, image.length));
             }
         }
@@ -256,12 +256,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startBindService(Intent intent, ServiceConnection mConnection, int bindAutoCreate) {
-        Log.e(TAG, "Bind Service");
+        //Log.e(TAG, "Bind Service");
         bindService(intent, mConnection, bindAutoCreate);
     }
 
     public void unBindService(ServiceConnection mConnection) {
-        Log.e(TAG, "Unbind Service");
+        //Log.e(TAG, "Unbind Service");
         unbindService(mConnection);
     }
 }

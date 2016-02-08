@@ -21,8 +21,6 @@ import android.widget.ImageView;
 import com.esterlorente.jediapp.data.LoginHelper;
 import com.esterlorente.jediapp.services.MediaPlayerService;
 
-import java.io.Serializable;
-
 public class MusicFragment extends Fragment implements View.OnClickListener {
     private String TAG = "MUSIC_FRAGMENT";
     private Context context;

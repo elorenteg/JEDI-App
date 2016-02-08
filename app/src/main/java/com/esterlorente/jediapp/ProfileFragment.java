@@ -206,15 +206,15 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
                 break;
             case PIC_CROP:
                 if (data != null) {
-                    Log.e(TAG, "Crop != null");
+                    ////Log.e(TAG, "Crop != null");
                     Bundle extras = data.getExtras();
                     Bitmap selectedBitmap = extras.getParcelable("data");
 
                     imageProfile.setImageBitmap(selectedBitmap);
                     updateImageByName(selectedBitmap);
                 } else
-                    Log.e(TAG, "Crop == null");
-                break;
+                    //Log.e(TAG, "Crop == null");
+                    break;
         }
     }
 
@@ -243,7 +243,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
     public void onSaveInstanceState(Bundle outstate) {
         super.onSaveInstanceState(outstate);
 
-        Log.e(TAG, "Guardando datos");
+        //Log.e(TAG, "Guardando datos");
 
         outstate.putString("textStreet", textStreet.getText().toString());
         outstate.putString("editStreet", editStreet.getText().toString());
@@ -258,7 +258,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         super.onActivityCreated(savedInstanceState);
 
         if (savedInstanceState != null) {
-            Log.e(TAG, "Restaurando datos");
+            //Log.e(TAG, "Restaurando datos");
 
             textStreet.setText(savedInstanceState.getString("textStreet"));
             editStreet.setText(savedInstanceState.getString("editStreet"));

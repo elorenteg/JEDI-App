@@ -11,7 +11,6 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 
 public class MediaPlayerService extends Service {
     private String TAG = "MEDIA_PLAYER_SERVICE";
@@ -30,7 +29,7 @@ public class MediaPlayerService extends Service {
         initMediaPlayer();
     }
 
-    public  void initMediaPlayer() {
+    public void initMediaPlayer() {
         File sdCard = Environment.getExternalStorageDirectory();
         File song = new File(sdCard.getAbsolutePath() + "/Music/song.mp3");
 

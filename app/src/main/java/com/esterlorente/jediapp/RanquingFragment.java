@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -122,7 +121,7 @@ public class RanquingFragment extends Fragment {
     public void onSaveInstanceState(Bundle outstate) {
         super.onSaveInstanceState(outstate);
 
-        Log.e(TAG, "Guardando datos");
+        //Log.e(TAG, "Guardando datos");
 
         outstate.putInt("numCards", numCards);
     }
@@ -132,7 +131,7 @@ public class RanquingFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         if (savedInstanceState != null) {
-            Log.e(TAG, "Restaurando datos");
+            //Log.e(TAG, "Restaurando datos");
 
             numCards = savedInstanceState.getInt("numCards");
             initRanquing();
@@ -160,7 +159,7 @@ public class RanquingFragment extends Fragment {
     }
 
     public void refresh(int numCards) {
-        Log.e(TAG, "Refresh");
+        //Log.e(TAG, "Refresh");
         this.numCards = numCards;
         ArrayList<Score> scores = getScoresByCard(numCards);
         adapter.changeData(scores);

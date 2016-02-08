@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,6 +40,7 @@ public class GameFragment extends Fragment implements ViewPager.OnPageChangeList
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.e(TAG, "onCreaterView");
         rootView = inflater.inflate(R.layout.fragment_game, container, false);
         context = getActivity();
         loginHelper = new LoginHelper(context);
@@ -62,13 +64,14 @@ public class GameFragment extends Fragment implements ViewPager.OnPageChangeList
         }
         Bundle b = new Bundle();
         b.putString("username", username);
+        b.putBoolean("first", true);
 
         MemoryFragment memoryFragment = new MemoryFragment();
         memoryFragment.setArguments(b);
 
         MyViewPagerAdapter adapter = new MyViewPagerAdapter(getChildFragmentManager());
-        adapter.addFragment(memoryFragment, getResources().getText(R.string.memory).toString());
-        adapter.addFragment(new RanquingFragment(), getResources().getText(R.string.ranquing).toString());
+        adapter.addFragment(memoryFragment, getString(R.string.memory));
+        adapter.addFragment(new RanquingFragment(), getString(R.string.ranquing));
         viewPager.setAdapter(adapter);
     }
 
@@ -79,6 +82,14 @@ public class GameFragment extends Fragment implements ViewPager.OnPageChangeList
         Log.e(TAG, "Guardando datos");
         outstate.putInt("numCards", numCards);
         outstate.putString("title", getActivity().getTitle().toString());
+
+
+        MyViewPagerAdapter adapter = (MyViewPagerAdapter) viewPager.getAdapter();
+
+        FragmentManager manager = getChildFragmentManager();
+        manager.putFragment(outstate, getString(R.string.memory), adapter.getItem(0));
+        manager.putFragment(outstate, getString(R.string.ranquing), adapter.getItem(1));
+
     }
 
     @Override
@@ -90,7 +101,21 @@ public class GameFragment extends Fragment implements ViewPager.OnPageChangeList
 
             numCards = savedInstanceState.getInt("numCards");
             getActivity().setTitle(savedInstanceState.getString("title"));
+
+            restoreFragment(savedInstanceState);
         }
+    }
+
+    private void restoreFragment(Bundle savedInstanceState) {
+        FragmentManager fragmentManager = getChildFragmentManager();
+
+        MyViewPagerAdapter adapter = new MyViewPagerAdapter(getChildFragmentManager());
+        adapter.addFragment(fragmentManager.getFragment(savedInstanceState, getString(R.string.memory)), getString(R.string.memory));
+        adapter.addFragment(fragmentManager.getFragment(savedInstanceState, getString(R.string.ranquing)), getString(R.string.ranquing));
+        viewPager.setAdapter(adapter);
+
+        tabLayout = (TabLayout) rootView.findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     @Override
@@ -104,19 +129,15 @@ public class GameFragment extends Fragment implements ViewPager.OnPageChangeList
         MyViewPagerAdapter adapter = (MyViewPagerAdapter) viewPager.getAdapter();
         switch (position) {
             case 1:
-                //((RanquingFragment) adapter.getItem(position)).refresh(numCards);
+                ((RanquingFragment) adapter.getItem(position)).refresh(numCards);
                 break;
         }
     }
 
     @Override
     public void onPageSelected(int position) {
-        MyViewPagerAdapter adapter = (MyViewPagerAdapter) viewPager.getAdapter();
-        switch (position) {
-            case 1:
-                //((RanquingFragment) adapter.getItem(position)).refresh(numCards);
-                break;
-        }
+        // onPageScrolled always activated when selected or scrolled tab
+        // so we can use to update the Ranquing Fragment
     }
 
     @Override
@@ -127,19 +148,36 @@ public class GameFragment extends Fragment implements ViewPager.OnPageChangeList
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.num2:
-                numCards = 2;
+                refreshFragment(2);
                 return true;
             case R.id.num4:
-                numCards = 4;
+                refreshFragment(4);
                 return true;
             case R.id.num6:
-                numCards = 6;
+                refreshFragment(6);
                 return true;
             case R.id.num8:
-                numCards = 8;
+                refreshFragment(8);
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private void refreshFragment(int numCards) {
+        MyViewPagerAdapter adapter = (MyViewPagerAdapter) viewPager.getAdapter();
+        int position = tabLayout.getSelectedTabPosition();
+        switch (position) {
+            case 0:
+                ((MemoryFragment) adapter.getItem(0)).restartMemory(numCards);
+                ((RanquingFragment) adapter.getItem(1)).refresh(numCards);
+                break;
+            case 1:
+                ((MemoryFragment) adapter.getItem(0)).restartMemory(numCards);
+                ((RanquingFragment) adapter.getItem(1)).refresh(numCards);
+                break;
+        }
+        this.numCards = numCards;
     }
 }
