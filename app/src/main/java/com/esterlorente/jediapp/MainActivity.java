@@ -7,8 +7,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -26,9 +24,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.esterlorente.jediapp.data.LoginHelper;
-import com.esterlorente.jediapp.utils.ImageParser;
 
 import java.io.File;
 
@@ -96,12 +94,16 @@ public class MainActivity extends AppCompatActivity {
             if (image != null) {
                 Uri uri = Uri.parse(image);
                 //Log.e(TAG, "Usuario no dispone de imagen");
-                File imgFile = new File(getRealPathFromURI(uri).toString());
-                if (imgFile.exists()) {
-                    final Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 
-                    updateNavHeader(bitmap);
+                if (!getRealPathFromURI(uri).equals("-1")) {
+                    File imgFile = new File(getRealPathFromURI(uri).toString());
+                    if (imgFile.exists()) {
+                        final Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 
+                        updateNavHeader(bitmap);
+                    }
+                } else {
+                    Toast.makeText(context, "Imagen borrada", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -194,9 +196,11 @@ public class MainActivity extends AppCompatActivity {
         if (cursor == null) { // Source is Dropbox or other similar local file path
             return contentURI.getPath();
         } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            return cursor.getString(idx);
+            if (cursor.moveToFirst()) {
+                int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                return cursor.getString(idx);
+            }
+            return "-1";
         }
     }
 
@@ -299,8 +303,6 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 int width = header.getWidth();
                 int height = header.getHeight();
-
-                Log.e(TAG, width + " " + height);
 
                 Bitmap bitmap3 = Bitmap.createScaledBitmap(bitmap, width, height, true);
                 //bitmap3 = ImageParser.blurRenderScript(context, bitmap3, 25);

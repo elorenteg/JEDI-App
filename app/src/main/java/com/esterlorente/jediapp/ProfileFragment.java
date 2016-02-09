@@ -225,7 +225,6 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
 
     private void changeImageAndBackground(Uri uri) {
         boolean defaultImage = (uri == null);
-        Log.e(TAG, "DefaultImage " + defaultImage);
 
         boolean imageExist = true;
         Bitmap bitmap = null;
@@ -238,10 +237,22 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
 
             bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.gato5);
         } else {
-            File imgFile = new File(getRealPathFromURI(uri).toString());
-            Log.e(TAG, "Uri " + getRealPathFromURI(uri).toString());
-            if (!imgFile.exists()) imageExist = false;
-            else bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+            if (!getRealPathFromURI(uri).equals("-1")) {
+                File imgFile = new File(getRealPathFromURI(uri).toString());
+                if (!imgFile.exists()) imageExist = false;
+                else bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+            }
+            else {
+                Toast.makeText(context, "Imagen borrada", Toast.LENGTH_SHORT).show();
+
+                int defaultDrawable = R.drawable.gato5;
+                uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
+                        getResources().getResourcePackageName(defaultDrawable) + '/' +
+                        getResources().getResourceTypeName(defaultDrawable) + '/' +
+                        getResources().getResourceEntryName(defaultDrawable));
+
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.gato5);
+            }
         }
 
         imageProfile.setTag(uri.toString());
@@ -255,8 +266,6 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
                 public void run() {
                     int width = imageBackground.getWidth();
                     int height = imageBackground.getHeight();
-
-                    Log.e(TAG, width + " " + height);
 
                     Bitmap bitmap3 = Bitmap.createScaledBitmap(bitmap1, width, height, true);
                     bitmap3 = ImageParser.blurRenderScript(getActivity(), bitmap3, 25);
@@ -274,9 +283,11 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         if (cursor == null) { // Source is Dropbox or other similar local file path
             return contentURI.getPath();
         } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            return cursor.getString(idx);
+            if (cursor.moveToFirst()) {
+                int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                return cursor.getString(idx);
+            }
+            return "-1";
         }
     }
 

@@ -3,13 +3,17 @@ package com.esterlorente.jediapp;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +24,7 @@ import com.esterlorente.jediapp.data.LoginHelper;
 import com.esterlorente.jediapp.utils.Score;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.ArrayList;
 
 
@@ -64,12 +69,37 @@ public class RanquingFragment extends Fragment {
             do {
                 String username = cursor.getString(cursor.getColumnIndex(loginHelper.USERNAME));
                 int score = cursor.getInt(cursor.getColumnIndex(loginHelper.SCORE));
-                byte[] image = cursor.getBlob(cursor.getColumnIndex(loginHelper.IMAGE));
-                if (image == null) {
+                String path = cursor.getString(cursor.getColumnIndex(loginHelper.IMAGE));
+                byte[] image = null;
+                if (path == null) {
                     Bitmap bitmap = drawableToBitmap(getActivity().getDrawable(R.drawable.gato5));
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 150, 150, true);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                     image = stream.toByteArray();
+                } else {
+                    Uri uri = Uri.parse(path);
+
+                    if (!getRealPathFromURI(uri).equals("-1")) {
+                        File imgFile = new File(getRealPathFromURI(uri).toString());
+                        if (imgFile.exists()) {
+                            Bitmap bitmap1 = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+
+                            Bitmap bitmap3 = Bitmap.createScaledBitmap(bitmap1, 150, 150, true);
+                            Drawable drawable = new BitmapDrawable(getResources(), bitmap3);
+
+                            Bitmap bitmap = drawableToBitmap(drawable);
+                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                            image = stream.toByteArray();
+                        } else {
+                            Bitmap bitmap = drawableToBitmap(getActivity().getDrawable(R.drawable.gato5));
+                            bitmap = Bitmap.createScaledBitmap(bitmap, 150, 150, true);
+                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                            image = stream.toByteArray();
+                        }
+                    }
                 }
                 Score scoreOBJ = new Score(image, username, score);
                 scores.add(scoreOBJ);
@@ -79,6 +109,19 @@ public class RanquingFragment extends Fragment {
         cursor.close();
 
         return scores;
+    }
+
+    private String getRealPathFromURI(Uri contentURI) {
+        Cursor cursor = context.getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            return contentURI.getPath();
+        } else {
+            if (cursor.moveToFirst()) {
+                int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                return cursor.getString(idx);
+            }
+            return "-1";
+        }
     }
 
     public static Bitmap drawableToBitmap(Drawable drawable) {
