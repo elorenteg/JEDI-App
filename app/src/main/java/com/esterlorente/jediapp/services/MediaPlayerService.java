@@ -1,7 +1,9 @@
 package com.esterlorente.jediapp.services;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
@@ -9,6 +11,7 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +25,7 @@ public class MediaPlayerService extends Service {
     private static ArrayList<String> songs;
 
     private int SONG_PLAYING;
+    private Context context;
 
     public MediaPlayerService() {
     }
@@ -35,6 +39,8 @@ public class MediaPlayerService extends Service {
         songs.add("This is the best day ever - MCR.mp3");
         songs.add("Because of You - TaeYeon & Tiffany.mp3");
         songs.add("If - TaeYeon.mp3");
+
+        context = this;
         initMediaPlayer();
     }
 
@@ -44,6 +50,7 @@ public class MediaPlayerService extends Service {
         File song = new File(sdCard.getAbsolutePath() + "/Music/" + songs.get(SONG_PLAYING));
 
         mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
@@ -59,6 +66,10 @@ public class MediaPlayerService extends Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getSongName() {
+        return songs.get(SONG_PLAYING);
     }
 
     public class MediaPlayerBinder extends Binder {
@@ -90,6 +101,7 @@ public class MediaPlayerService extends Service {
 
         if (!mediaPlayer.isPlaying()) {
             mediaPlayer.start();
+            Toast.makeText(context, getSongName(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -139,6 +151,8 @@ public class MediaPlayerService extends Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        Toast.makeText(context, getSongName(), Toast.LENGTH_SHORT).show();
 
         mediaPlayer.start();
     }
