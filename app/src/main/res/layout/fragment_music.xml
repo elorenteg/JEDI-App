@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.esterlorente.jediapp.MusicFragment">
+    tools:context="com.esterlorente.jediapp.MusicFragment"
+    android:gravity="center_horizontal">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,6 +21,11 @@
             android:minWidth="200dp"
             android:src="@drawable/gato" />
     </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textSong" />
 
     <LinearLayout
         android:layout_width="match_parent"

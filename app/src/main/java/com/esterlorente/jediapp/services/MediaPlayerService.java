@@ -44,6 +44,14 @@ public class MediaPlayerService extends Service {
         File song = new File(sdCard.getAbsolutePath() + "/Music/" + songs.get(SONG_PLAYING));
 
         mediaPlayer = new MediaPlayer();
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                SONG_PLAYING = SONG_PLAYING + 1;
+                if (SONG_PLAYING == songs.size()) SONG_PLAYING = 0;
+                newSong();
+            }
+        });
 
         try {
             mediaPlayer.setDataSource(song.getAbsolutePath());
