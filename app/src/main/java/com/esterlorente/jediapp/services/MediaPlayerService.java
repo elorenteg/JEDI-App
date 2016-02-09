@@ -3,6 +3,7 @@ package com.esterlorente.jediapp.services;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
@@ -11,12 +12,16 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MediaPlayerService extends Service {
     private String TAG = "MEDIA_PLAYER_SERVICE";
     private final IBinder mBinder = new MediaPlayerBinder();
 
     private static MediaPlayer mediaPlayer;
+    private static ArrayList<String> songs;
+
+    private int SONG_PLAYING;
 
     public MediaPlayerService() {
     }
@@ -26,12 +31,17 @@ public class MediaPlayerService extends Service {
     }
 
     public void onCreate() {
+        songs = new ArrayList();
+        songs.add("This is the best day ever - MCR.mp3");
+        songs.add("Because of You - TaeYeon & Tiffany.mp3");
+        songs.add("If - TaeYeon.mp3");
         initMediaPlayer();
     }
 
     public void initMediaPlayer() {
+        SONG_PLAYING = 0;
         File sdCard = Environment.getExternalStorageDirectory();
-        File song = new File(sdCard.getAbsolutePath() + "/Music/song.mp3");
+        File song = new File(sdCard.getAbsolutePath() + "/Music/" + songs.get(SONG_PLAYING));
 
         mediaPlayer = new MediaPlayer();
 
@@ -91,11 +101,52 @@ public class MediaPlayerService extends Service {
         }
     }
 
+    public void next() {
+        if (mediaPlayer.isPlaying()) {
+            SONG_PLAYING = SONG_PLAYING + 1;
+            if (SONG_PLAYING == songs.size()) SONG_PLAYING = 0;
+
+            newSong();
+        }
+    }
+
+    public void previous() {
+        if (mediaPlayer.isPlaying()) {
+            SONG_PLAYING = SONG_PLAYING - 1;
+            if (SONG_PLAYING == -1) SONG_PLAYING = songs.size() - 1;
+
+            newSong();
+        }
+    }
+
+    public void newSong() {
+        File sdCard = Environment.getExternalStorageDirectory();
+        File song = new File(sdCard.getAbsolutePath() + "/Music/" + songs.get(SONG_PLAYING));
+
+        mediaPlayer.reset();
+
+        try {
+            mediaPlayer.setDataSource(MediaPlayerService.this, Uri.parse(song.getAbsolutePath()));
+            mediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        mediaPlayer.start();
+    }
+
+
     public int getTimeMedia() {
         return mediaPlayer.getCurrentPosition();
     }
 
-    public void setTimeMedia(int time) {
+    public int getSong() {
+        return SONG_PLAYING;
+    }
+
+    public void restartMediaPlayer(int song, int time) {
+        SONG_PLAYING = song;
+        newSong();
         mediaPlayer.seekTo(time);
     }
 }

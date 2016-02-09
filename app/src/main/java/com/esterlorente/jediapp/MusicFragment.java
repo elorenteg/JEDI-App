@@ -14,7 +14,6 @@ import android.support.v4.app.TaskStackBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
@@ -28,8 +27,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
     private LoginHelper loginHelper;
 
     private ImageView imageCover;
-    private Button buttonPlay, buttonNext, buttonPrevious, buttonStop;
-    private ImageButton imagePlay, imageNext, imagePrevious;
+    private ImageButton imagePlay, imageNext, imagePrevious, imageStop;
 
     private MediaPlayerService mService;
     private boolean bound = false;
@@ -70,51 +68,49 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
     private void initView() {
         imageCover = (ImageView) rootView.findViewById(R.id.imageCover);
 
-        buttonPlay = (Button) rootView.findViewById(R.id.buttonPlay);
-        buttonNext = (Button) rootView.findViewById(R.id.buttonNext);
-        buttonPrevious = (Button) rootView.findViewById(R.id.buttonPrevious);
-        buttonStop = (Button) rootView.findViewById(R.id.buttonStop);
-
-        buttonPlay.setOnClickListener(this);
-        buttonNext.setOnClickListener(this);
-        buttonPrevious.setOnClickListener(this);
-        buttonStop.setOnClickListener(this);
-
         imagePlay = (ImageButton) rootView.findViewById(R.id.imagePlay);
         imageNext = (ImageButton) rootView.findViewById(R.id.imageNext);
         imagePrevious = (ImageButton) rootView.findViewById(R.id.imagePrevious);
+        imageStop = (ImageButton) rootView.findViewById(R.id.imageStop);
 
         imagePlay.setOnClickListener(this);
         imageNext.setOnClickListener(this);
         imagePrevious.setOnClickListener(this);
+        imageStop.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.buttonPlay:
             case R.id.imagePlay:
 
                 if (bound) {
                     if (mService.isPlaying()) {
-                        buttonPlay.setText("Play");
+                        //buttonPlay.setText("Play");
+                        imagePlay.setImageDrawable(getResources().getDrawable(R.drawable.play));
                         mService.pause();
                     } else {
-                        buttonPlay.setText("Pause");
+                        //buttonPlay.setText("Pause");
+                        imagePlay.setImageDrawable(getResources().getDrawable(R.drawable.pause));
                         mService.play();
                         if (!isNotificationVisible()) sendNotification();
                     }
                 }
                 break;
-            case R.id.buttonNext:
             case R.id.imageNext:
+                if (bound) {
+                    mService.next();
+                }
                 break;
-            case R.id.buttonPrevious:
             case R.id.imagePrevious:
+                if (bound) {
+                    mService.previous();
+                }
                 break;
-            case R.id.buttonStop:
+            case R.id.imageStop:
                 mService.stop();
-                buttonPlay.setText("Play");
+                //buttonPlay.setText("Play");
+                imagePlay.setImageDrawable(getResources().getDrawable(R.drawable.play));
                 deleteNotification();
                 break;
         }
@@ -185,6 +181,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
         outstate.putInt("Position", mService.getTimeMedia());
         outstate.putBoolean("isplaying", mService.isPlaying());
+        outstate.putInt("song", mService.getSong());
 
         mService.stop();
     }
@@ -198,12 +195,13 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
             int position = savedInstanceState.getInt("Position");
             boolean isPlaying = savedInstanceState.getBoolean("isplaying");
+            int song = savedInstanceState.getInt("song");
 
-            startService(position, isPlaying);
+            startService(position, isPlaying, song);
         }
     }
 
-    private void startService(final int position, final boolean isPlaying) {
+    private void startService(final int position, final boolean isPlaying, final int song) {
         mConnection = new ServiceConnection() {
 
             @Override
@@ -213,11 +211,11 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
                 MediaPlayerService.MediaPlayerBinder binder = (MediaPlayerService.MediaPlayerBinder) service;
 
                 mService = binder.getService();
-                mService.initMediaPlayer();
-                mService.setTimeMedia(position);
+                mService.restartMediaPlayer(song, position);
                 if (isPlaying) {
                     mService.play();
-                    buttonPlay.setText("Pause");
+                    //buttonPlay.setText("Pause");
+                    imagePlay.setImageDrawable(getResources().getDrawable(R.drawable.pause));
                 }
 
                 bound = true;

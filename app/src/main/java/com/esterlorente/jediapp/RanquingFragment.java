@@ -154,8 +154,25 @@ public class RanquingFragment extends Fragment {
         //seg�n la estructura definida.
         //Asignamos nuestro custom Adapter
         ArrayList<Score> scores = getScoresByCard(numCards);
+        //scores = filterPostDelete(scores, numCards);
         adapter = new MyCustomAdapter(scores);
         mRecyclerView.setAdapter(adapter);
+    }
+
+    private ArrayList<Score> filterPostDelete(ArrayList<Score> scores, int numCards) {
+        /*
+        SharedPreferences pref = context.getSharedPreferences("MyPref", Context.MODE_PRIVATE);
+        String username = pref.getString("key_username", null);
+        if (username != null) {
+            loginUser(username);
+        }
+
+        ArrayList<Score> filteredScores = new ArrayList();
+        for (int i = 0; i < scores.size(); ++i) {
+
+        }
+        */
+        return null;
     }
 
     public void refresh(int numCards) {
