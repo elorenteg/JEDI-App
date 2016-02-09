@@ -1,12 +1,15 @@
 package com.esterlorente.jediapp;
 
 import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -14,21 +17,22 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.esterlorente.jediapp.data.LoginHelper;
 import com.esterlorente.jediapp.utils.ImageParser;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -45,9 +49,9 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
     private Context context;
     private LoginHelper loginHelper;
 
+    private LinearLayout imageBackground;
     private ImageView imageProfile;
-    private Button buttonStreet;
-    private ImageButton imageCamera, imageGallery, imageGPS;
+    private ImageButton imageCamera, imageGallery, imageGPS, imageEdit;
     private EditText editStreet;
     private TextView textUsername, textStreet, textLatitude, textLongitude, text2Cards, text4Cards, text6Cards, text8Cards;
 
@@ -87,9 +91,10 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
 
         Cursor cursor1 = loginHelper.getUserImageByName(username);
         if (cursor1.moveToFirst()) {
-            byte[] image = cursor1.getBlob(cursor1.getColumnIndex(loginHelper.IMAGE));
+            String image = cursor1.getString(cursor1.getColumnIndex(loginHelper.IMAGE));
             if (image != null) {
-                imageProfile.setImageBitmap(ImageParser.byteArrayToBitmap(image));
+                Uri uri = Uri.parse(image);
+                changeImageAndBackground(uri);
             }
         }
 
@@ -119,11 +124,11 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
 
     private void initButtons() {
         imageProfile = (ImageView) rootview.findViewById(R.id.imageProfile);
-        buttonStreet = (Button) rootview.findViewById(R.id.buttonStreet);
+        imageEdit = (ImageButton) rootview.findViewById(R.id.imageEdit);
         imageCamera = (ImageButton) rootview.findViewById(R.id.imageCamera);
         imageGPS = (ImageButton) rootview.findViewById(R.id.imageGPS);
         imageGallery = (ImageButton) rootview.findViewById(R.id.imageGallery);
-        editStreet = (EditText) rootview.findViewById(R.id.editStreet);
+        //editStreet = (EditText) rootview.findViewById(R.id.editStreet);
         textStreet = (TextView) rootview.findViewById(R.id.textStreet);
         textUsername = (TextView) rootview.findViewById(R.id.textName);
         textLatitude = (TextView) rootview.findViewById(R.id.textLatitude);
@@ -133,20 +138,23 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         text6Cards = (TextView) rootview.findViewById(R.id.text_sisCards);
         text8Cards = (TextView) rootview.findViewById(R.id.text_vuiCards);
 
-        buttonStreet.setOnClickListener(this);
+        imageEdit.setOnClickListener(this);
         imageCamera.setOnClickListener(this);
         imageGPS.setOnClickListener(this);
         imageGallery.setOnClickListener(this);
 
-        editStreet.setVisibility(View.GONE);
+        imageBackground = (LinearLayout) rootview.findViewById(R.id.imageBackground);
+        changeImageAndBackground(null);
+
+        //editStreet.setVisibility(View.GONE);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.buttonStreet:
-                changeVisibility();
-                break;
+            //case R.id.buttonStreet:
+            //    changeVisibility();
+            //    break;
             case R.id.imageCamera:
                 makeImageCamera();
                 break;
@@ -195,37 +203,81 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
             case CAMERA_REQUEST:
                 if (resultCode == getActivity().RESULT_OK) {
                     Uri selectedImage = data.getData();
-                    performCrop(selectedImage);
+                    changeImageAndBackground(selectedImage);
+                    //performCrop(selectedImage);
                 }
                 break;
             case GALLERY_REQUEST:
                 if (resultCode == getActivity().RESULT_OK) {
                     Uri selectedImage = data.getData();
-                    performCrop(selectedImage);
+                    changeImageAndBackground(selectedImage);
+                    //performCrop(selectedImage);
                 }
                 break;
-            case PIC_CROP:
-                if (data != null) {
-                    ////Log.e(TAG, "Crop != null");
-                    Bundle extras = data.getExtras();
-                    Bitmap selectedBitmap = extras.getParcelable("data");
-
-                    imageProfile.setImageBitmap(selectedBitmap);
-                    updateImageByName(selectedBitmap);
-                } else
-                    //Log.e(TAG, "Crop == null");
-                    break;
         }
     }
 
-    private void updateImageByName(Bitmap bitmap) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        byte[] image = stream.toByteArray();
-
+    private void updateImageByName(Uri uri) {
         ContentValues valuesToStore = new ContentValues();
-        valuesToStore.put(loginHelper.IMAGE, image);
+        valuesToStore.put(loginHelper.IMAGE, uri.toString());
         loginHelper.updateImageByName(valuesToStore, textUsername.getText().toString());
+    }
+
+    private void changeImageAndBackground(Uri uri) {
+        boolean defaultImage = (uri == null);
+        Log.e(TAG, "DefaultImage " + defaultImage);
+
+        boolean imageExist = true;
+        Bitmap bitmap = null;
+        if (defaultImage) {
+            int defaultDrawable = R.drawable.gato5;
+            uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
+                    getResources().getResourcePackageName(defaultDrawable) + '/' +
+                    getResources().getResourceTypeName(defaultDrawable) + '/' +
+                    getResources().getResourceEntryName(defaultDrawable));
+
+            bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.gato5);
+        } else {
+            File imgFile = new File(getRealPathFromURI(uri).toString());
+            Log.e(TAG, "Uri " + getRealPathFromURI(uri).toString());
+            if (!imgFile.exists()) imageExist = false;
+            else bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+        }
+
+        imageProfile.setTag(uri.toString());
+        ImageParser.roundEffect(getActivity(), imageProfile, uri);
+        updateImageByName(uri);
+
+        if (imageExist) {
+            final Bitmap bitmap1 = bitmap;
+            imageBackground.post(new Runnable() {
+                @Override
+                public void run() {
+                    int width = imageBackground.getWidth();
+                    int height = imageBackground.getHeight();
+
+                    Log.e(TAG, width + " " + height);
+
+                    Bitmap bitmap3 = Bitmap.createScaledBitmap(bitmap1, width, height, true);
+                    bitmap3 = ImageParser.blurRenderScript(getActivity(), bitmap3, 25);
+                    Drawable drawable = new BitmapDrawable(getResources(), bitmap3);
+                    imageBackground.setBackground(drawable);
+
+                    ((MainActivity) getActivity()).updateNavHeader(bitmap1);
+                }
+            });
+        } else Log.e(TAG, "Uri no valida");
+    }
+
+    private String getRealPathFromURI(Uri contentURI) {
+        Cursor cursor = context.getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            return contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            return cursor.getString(idx);
+        }
     }
 
     private void changeVisibility() {
@@ -246,10 +298,11 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         //Log.e(TAG, "Guardando datos");
 
         outstate.putString("textStreet", textStreet.getText().toString());
-        outstate.putString("editStreet", editStreet.getText().toString());
-        outstate.putBoolean("stateEdits", editStreet.getVisibility() == View.VISIBLE);
+        //outstate.putString("editStreet", editStreet.getText().toString());
+        //outstate.putBoolean("stateEdits", editStreet.getVisibility() == View.VISIBLE);
 
-        outstate.putByteArray("imageProfile", ImageParser.bitmapToByteArray(((BitmapDrawable) imageProfile.getDrawable()).getBitmap()));
+        //outstate.putByteArray("imageProfile", ImageParser.bitmapToByteArray(((BitmapDrawable) imageProfile.getDrawable()).getBitmap()));
+        outstate.putString("imageTag", imageProfile.getTag().toString());
         outstate.putString("username", textUsername.getText().toString());
     }
 
@@ -261,15 +314,18 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
             //Log.e(TAG, "Restaurando datos");
 
             textStreet.setText(savedInstanceState.getString("textStreet"));
-            editStreet.setText(savedInstanceState.getString("editStreet"));
-            boolean stateEdits = savedInstanceState.getBoolean("stateEdits");
-            if (stateEdits) {
-                textStreet.setVisibility(View.GONE);
-                editStreet.setVisibility(View.VISIBLE);
-            }
+            //editStreet.setText(savedInstanceState.getString("editStreet"));
+            //boolean stateEdits = savedInstanceState.getBoolean("stateEdits");
+            //if (stateEdits) {
+            //textStreet.setVisibility(View.GONE);
+            //editStreet.setVisibility(View.VISIBLE);
+            //}
 
             textUsername.setText(savedInstanceState.getString("username"));
-            imageProfile.setImageBitmap(ImageParser.byteArrayToBitmap(savedInstanceState.getByteArray("imageProfile")));
+
+            Uri uri = Uri.parse(savedInstanceState.getString("imageTag"));
+            ImageParser.roundEffect(getActivity(), imageProfile, uri);
+            //imageProfile.setImageBitmap(ImageParser.byteArrayToBitmap(savedInstanceState.getByteArray("imageProfile")));
         }
     }
 
@@ -314,4 +370,6 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, lis);
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, lis);
     }
+
+
 }

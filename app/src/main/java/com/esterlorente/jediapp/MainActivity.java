@@ -5,8 +5,13 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -23,6 +28,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.esterlorente.jediapp.data.LoginHelper;
+import com.esterlorente.jediapp.utils.ImageParser;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
     private String TAG = "MAIN_ACTIVITY";
@@ -78,17 +86,23 @@ public class MainActivity extends AppCompatActivity {
         navigationView = (NavigationView) findViewById(R.id.navview);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        View header = navigationView.getHeaderView(0);
+        final View header = navigationView.getHeaderView(0);
         TextView textUsername = (TextView) header.findViewById(R.id.navview_username);
         textUsername.setText(username);
 
-        ImageView imageUsername = (ImageView) header.findViewById(R.id.navview_image);
         Cursor cursor = loginHelper.getUserImageByName(username);
         if (cursor.moveToFirst()) {
-            byte[] image = cursor.getBlob(cursor.getColumnIndex(loginHelper.IMAGE));
+            String image = cursor.getString(cursor.getColumnIndex(loginHelper.IMAGE));
             if (image != null) {
+                Uri uri = Uri.parse(image);
                 //Log.e(TAG, "Usuario no dispone de imagen");
-                imageUsername.setImageBitmap(BitmapFactory.decodeByteArray(image, 0, image.length));
+                File imgFile = new File(getRealPathFromURI(uri).toString());
+                if (imgFile.exists()) {
+                    final Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+
+                    updateNavHeader(bitmap);
+
+                }
             }
         }
 
@@ -173,6 +187,17 @@ public class MainActivity extends AppCompatActivity {
 
         // calling sync state is necessay or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();
+    }
+
+    private String getRealPathFromURI(Uri contentURI) {
+        Cursor cursor = context.getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            return contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            return cursor.getString(idx);
+        }
     }
 
     @Override
@@ -263,5 +288,24 @@ public class MainActivity extends AppCompatActivity {
     public void unBindService(ServiceConnection mConnection) {
         //Log.e(TAG, "Unbind Service");
         unbindService(mConnection);
+    }
+
+    public void updateNavHeader(final Bitmap bitmap) {
+        final View header = navigationView.getHeaderView(0);
+        final ImageView imageUsername = (ImageView) header.findViewById(R.id.navview_image);
+
+        header.post(new Runnable() {
+            @Override
+            public void run() {
+                int width = header.getWidth();
+                int height = header.getHeight();
+
+                Log.e(TAG, width + " " + height);
+
+                Bitmap bitmap3 = Bitmap.createScaledBitmap(bitmap, width, height, true);
+                //bitmap3 = ImageParser.blurRenderScript(context, bitmap3, 25);
+                imageUsername.setImageBitmap(bitmap3);
+            }
+        });
     }
 }
