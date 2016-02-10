@@ -18,6 +18,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.CoordinatorLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,7 +54,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
     private ImageView imageProfile;
     private ImageButton imageCamera, imageGallery, imageGPS, imageEdit;
     private EditText editStreet;
-    private TextView textUsername, textStreet, textLatitude, textLongitude, text2Cards, text4Cards, text6Cards, text8Cards;
+    private TextView textUsername, textEmail, textStreet, textLastNotif, textLatitude, textLongitude, text2Cards, text4Cards, text6Cards, text8Cards;
 
     private List<Address> l;
     private LocationManager lm;
@@ -89,12 +90,32 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
     private void initProfile() {
         textUsername.setText(username);
 
-        Cursor cursor1 = loginHelper.getUserImageByName(username);
+        Cursor cursor1 = loginHelper.getUserProfileByName(username);
         if (cursor1.moveToFirst()) {
             String image = cursor1.getString(cursor1.getColumnIndex(loginHelper.IMAGE));
             if (image != null) {
                 Uri uri = Uri.parse(image);
                 changeImageAndBackground(uri);
+            }
+
+            String email = cursor1.getString(cursor1.getColumnIndex(loginHelper.EMAIL));
+            textEmail.setText(email);
+
+            String lastNotif = cursor1.getString(cursor1.getColumnIndex(loginHelper.LAST_NOTIF));
+            if (lastNotif != null) {
+                textLastNotif.setText(lastNotif);
+            }
+
+            String street = cursor1.getString(cursor1.getColumnIndex(loginHelper.STREET));
+            if (street != null) {
+                textStreet.setText(street);
+            }
+
+            String latitude = cursor1.getString(cursor1.getColumnIndex(loginHelper.LATITUDE));
+            String longitude = cursor1.getString(cursor1.getColumnIndex(loginHelper.LONGITUDE));
+            if (latitude != null) {
+                textLatitude.setText(latitude);
+                textLongitude.setText(longitude);
             }
         }
 
@@ -128,9 +149,12 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         imageCamera = (ImageButton) rootview.findViewById(R.id.imageCamera);
         imageGPS = (ImageButton) rootview.findViewById(R.id.imageGPS);
         imageGallery = (ImageButton) rootview.findViewById(R.id.imageGallery);
-        //editStreet = (EditText) rootview.findViewById(R.id.editStreet);
-        textStreet = (TextView) rootview.findViewById(R.id.textStreet);
+        editStreet = (EditText) rootview.findViewById(R.id.editStreet);
+
         textUsername = (TextView) rootview.findViewById(R.id.textName);
+        textEmail = (TextView) rootview.findViewById(R.id.text_email);
+        textStreet = (TextView) rootview.findViewById(R.id.textStreet);
+        textLastNotif = (TextView) rootview.findViewById(R.id.text_notification);
         textLatitude = (TextView) rootview.findViewById(R.id.textLatitude);
         textLongitude = (TextView) rootview.findViewById(R.id.textLongitude);
         text2Cards = (TextView) rootview.findViewById(R.id.text_dosCards);
@@ -146,15 +170,15 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         imageBackground = (LinearLayout) rootview.findViewById(R.id.imageBackground);
         changeImageAndBackground(null);
 
-        //editStreet.setVisibility(View.GONE);
+        editStreet.setVisibility(View.GONE);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            //case R.id.buttonStreet:
-            //    changeVisibility();
-            //    break;
+            case R.id.imageEdit:
+                changeVisibility();
+                break;
             case R.id.imageCamera:
                 makeImageCamera();
                 break;
@@ -241,8 +265,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
                 File imgFile = new File(getRealPathFromURI(uri).toString());
                 if (!imgFile.exists()) imageExist = false;
                 else bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-            }
-            else {
+            } else {
                 Toast.makeText(context, "Imagen borrada", Toast.LENGTH_SHORT).show();
 
                 int defaultDrawable = R.drawable.gato5;
@@ -299,7 +322,22 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
             textStreet.setText(editStreet.getText().toString());
             editStreet.setVisibility(View.GONE);
             textStreet.setVisibility(View.VISIBLE);
+
+            updateUserStreetByName();
         }
+    }
+
+    private void updateUserStreetByName() {
+        ContentValues valuesToStore = new ContentValues();
+        valuesToStore.put(loginHelper.STREET, textStreet.getText().toString());
+        loginHelper.updateUserStreetByName(valuesToStore, textUsername.getText().toString());
+    }
+
+    private void updateCoordinatesByName() {
+        ContentValues valuesToStore = new ContentValues();
+        valuesToStore.put(loginHelper.LATITUDE, textLatitude.getText().toString());
+        valuesToStore.put(loginHelper.LONGITUDE, textLongitude.getText().toString());
+        loginHelper.updateUserCoordinatesByName(valuesToStore, textUsername.getText().toString());
     }
 
     @Override
@@ -309,12 +347,15 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         //Log.e(TAG, "Guardando datos");
 
         outstate.putString("textStreet", textStreet.getText().toString());
-        //outstate.putString("editStreet", editStreet.getText().toString());
-        //outstate.putBoolean("stateEdits", editStreet.getVisibility() == View.VISIBLE);
+        outstate.putString("editStreet", editStreet.getText().toString());
+        outstate.putBoolean("stateEdits", editStreet.getVisibility() == View.VISIBLE);
 
         //outstate.putByteArray("imageProfile", ImageParser.bitmapToByteArray(((BitmapDrawable) imageProfile.getDrawable()).getBitmap()));
         outstate.putString("imageTag", imageProfile.getTag().toString());
         outstate.putString("username", textUsername.getText().toString());
+
+        outstate.putString("latitude", textLatitude.getText().toString());
+        outstate.putString("longitude", textLongitude.getText().toString());
     }
 
     @Override
@@ -325,18 +366,23 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
             //Log.e(TAG, "Restaurando datos");
 
             textStreet.setText(savedInstanceState.getString("textStreet"));
-            //editStreet.setText(savedInstanceState.getString("editStreet"));
-            //boolean stateEdits = savedInstanceState.getBoolean("stateEdits");
-            //if (stateEdits) {
-            //textStreet.setVisibility(View.GONE);
-            //editStreet.setVisibility(View.VISIBLE);
-            //}
+            editStreet.setText(savedInstanceState.getString("editStreet"));
+            boolean stateEdits = savedInstanceState.getBoolean("stateEdits");
+            if (stateEdits) {
+                textStreet.setVisibility(View.GONE);
+                editStreet.setVisibility(View.VISIBLE);
+            }
 
             textUsername.setText(savedInstanceState.getString("username"));
 
             Uri uri = Uri.parse(savedInstanceState.getString("imageTag"));
             ImageParser.roundEffect(getActivity(), imageProfile, uri);
             //imageProfile.setImageBitmap(ImageParser.byteArrayToBitmap(savedInstanceState.getByteArray("imageProfile")));
+
+            textLatitude.setText(savedInstanceState.getString("latitude"));
+            textLongitude.setText(savedInstanceState.getString("longitude"));
+
+            updateCoordinatesByName();
         }
     }
 
@@ -364,7 +410,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
                 Geocoder gc = new Geocoder(getActivity().getApplicationContext());
                 try {
                     l = gc.getFromLocation(location.getLatitude(),
-                            location.getLongitude(), 5);
+                            location.getLongitude(), 1);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -372,7 +418,15 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
                     Log.v("LOG", l.get(i).getAddressLine(0).toString());
 
                     if (i == 0) textLongitude.setText("");
-                    textLongitude.setText(textLongitude.getText() + "\n" + l.get(i).getAddressLine(0).toString());
+                    textLatitude.setText(String.valueOf(l.get(i).getLatitude()));
+                    textLongitude.setText(String.valueOf(l.get(i).getLongitude()));
+
+                    Log.e(TAG, "Lat " + textLatitude.getText().toString());
+                    Log.e(TAG, "Long " + textLongitude.getText().toString());
+                    //getFromLocation(l.get(i).getAddressLine(0).toString());
+
+                    lm.removeUpdates(lis);
+                    lm = null;
                 }
                 Log.v("LOG", ((Double) location.getLatitude()).toString());
             }
@@ -381,6 +435,4 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, lis);
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, lis);
     }
-
-
 }

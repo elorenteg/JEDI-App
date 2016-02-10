@@ -237,6 +237,8 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
     }
 
     private void showEndGame() {
+        updateLastNotification();
+
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(context)
                 .setTitle(getString(R.string.complete)).setIcon(R.drawable.gato)
                 .setMessage(getString(R.string.alert_mss) + " " + textAttempts.getText() + "\n" +
@@ -338,5 +340,12 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         textAttempts.setText("0");
         listCards = null;
         initCards();
+    }
+
+
+    private void updateLastNotification() {
+        ContentValues valuesToStore = new ContentValues();
+        valuesToStore.put(loginHelper.LAST_NOTIF, getString(R.string.alert_mss) + " " + textAttempts.getText());
+        loginHelper.updateLastNotification(valuesToStore, username);
     }
 }

@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.esterlorente.jediapp.data.LoginHelper;
 
@@ -48,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
                 String pass = editPass.getText().toString();
 
                 if (validateUser(name, pass)) {
-                    Toast.makeText(context, "Login correcto!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "Login correcto!", Toast.LENGTH_SHORT).show();
 
                     editor.putString("key_username", name);
                     editor.commit();

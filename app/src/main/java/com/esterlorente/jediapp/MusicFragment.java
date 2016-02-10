@@ -3,6 +3,7 @@ package com.esterlorente.jediapp;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -28,6 +29,8 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
     private ImageView imageCover;
     private ImageButton imagePlay, imageNext, imagePrevious, imageStop;
+
+    private String username;
 
     private MediaPlayerService mService;
     private boolean bound = false;
@@ -58,6 +61,11 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
         context = getActivity();
         loginHelper = new LoginHelper(context);
         setHasOptionsMenu(true);
+
+        Bundle args = this.getArguments();
+        if (args != null) {
+            username = args.getString("username");
+        }
 
         initView();
 
@@ -229,4 +237,12 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
     }
 
+
+    private void updateLastNotification() {
+        String songName = mService.getSongName();
+
+        ContentValues valuesToStore = new ContentValues();
+        valuesToStore.put(loginHelper.LAST_NOTIF, "Escuchando " + songName);
+        loginHelper.updateLastNotification(valuesToStore, username);
+    }
 }

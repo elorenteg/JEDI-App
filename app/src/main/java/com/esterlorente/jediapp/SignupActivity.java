@@ -50,7 +50,7 @@ public class SignupActivity extends AppCompatActivity {
 
                 if (validateNewUser(name, pass, email)) {
                     // Datos validos
-                    Toast.makeText(context, "Nuevo usuario: " + name + " + " + pass, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Bienvenido " + name + "!", Toast.LENGTH_SHORT).show();
 
                     SharedPreferences pref = context.getSharedPreferences("MyPref", Context.MODE_PRIVATE);
                     final SharedPreferences.Editor editor = pref.edit();
@@ -98,6 +98,14 @@ public class SignupActivity extends AppCompatActivity {
         valuesToStore.putNull(loginHelper.IMAGE);
         valuesToStore.putNull(loginHelper.STREET);
         loginHelper.createUser(valuesToStore);
+
+        updateLastNotification(name, pass);
+    }
+
+    private void updateLastNotification(String name, String pass) {
+        ContentValues valuesToStore = new ContentValues();
+        valuesToStore.put(loginHelper.LAST_NOTIF, "Bienvenido " + name + "!");
+        loginHelper.updateLastNotification(valuesToStore, name);
     }
 
     private boolean validateNewUser(String username, String password, String email) {

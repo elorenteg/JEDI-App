@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class LoginHelper extends SQLiteOpenHelper {
 
     // Declaracion del nombre de la base de datos
-    public static final int DATABASE_VERSION = 7;
+    public static final int DATABASE_VERSION = 9;
 
     // Declaracion global de la version de la base de datos
     public static final String DATABASE_NAME = "USER_DB";
@@ -24,8 +24,11 @@ public class LoginHelper extends SQLiteOpenHelper {
     public static final String EMAIL = "email";
     public static final String IMAGE = "image";
     public static final String STREET = "street";
+    public static final String LAST_NOTIF = "last_notif";
     public static final String SCORE = "score";
     public static final String NUMCARDS = "numcards";
+    public static final String LATITUDE = "latitude";
+    public static final String LONGITUDE = "longitude";
 
     // sentencia global de cracion de la base de datos
     public static final String USER_TABLE_CREATE = "CREATE TABLE " + USER_TABLE + " (" +
@@ -33,7 +36,10 @@ public class LoginHelper extends SQLiteOpenHelper {
             PASSWORD + " TEXT, " +
             EMAIL + " TEXT, " +
             IMAGE + " TEXT, " +
-            STREET + " TEXT );";
+            STREET + " TEXT, " +
+            LAST_NOTIF + " TEXT, " +
+            LATITUDE + " TEXT, " +
+            LONGITUDE + " TEXT);";
 
     public static final String SCORE_TABLE_CREATE = "CREATE TABLE " + SCORE_TABLE + " (" +
             USERNAME + " TEXT, " +
@@ -71,6 +77,22 @@ public class LoginHelper extends SQLiteOpenHelper {
     public Cursor getUserImageByName(String username) {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] columns = {IMAGE};
+        String[] where = {username};
+        Cursor c = db.query(
+                USER_TABLE,                             // The table to query
+                columns,                                // The columns to return
+                USERNAME + "=?",                        // The columns for the WHERE clause
+                where,                                  // The values for the WHERE clause
+                null,                                   // don't group the rows
+                null,                                   // don't filter by row groups
+                null                                    // The sort order
+        );
+        return c;
+    }
+
+    public Cursor getUserProfileByName(String username) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = {EMAIL, IMAGE, LAST_NOTIF, STREET, LATITUDE, LONGITUDE};
         String[] where = {username};
         Cursor c = db.query(
                 USER_TABLE,                             // The table to query
@@ -172,5 +194,38 @@ public class LoginHelper extends SQLiteOpenHelper {
                 null                                    // The sort order
         );
         return c;
+    }
+
+    public void updateLastNotification(ContentValues values, String username) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String[] where = {username};
+        db.update(
+                USER_TABLE,                             // The table to query
+                values,                                 // The new column values
+                USERNAME + "=?",                        // The columns for the WHERE clause
+                where                                   // The values for the WHERE clause
+        );
+    }
+
+    public void updateUserStreetByName(ContentValues values, String username) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String[] where = {username};
+        db.update(
+                USER_TABLE,                             // The table to query
+                values,                                 // The new column values
+                USERNAME + "=?",                        // The columns for the WHERE clause
+                where                                   // The values for the WHERE clause
+        );
+    }
+
+    public void updateUserCoordinatesByName(ContentValues values, String username) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String[] where = {username};
+        db.update(
+                USER_TABLE,                             // The table to query
+                values,                                 // The new column values
+                USERNAME + "=?",                        // The columns for the WHERE clause
+                where                                   // The values for the WHERE clause
+        );
     }
 }
