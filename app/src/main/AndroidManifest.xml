@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-feature android:name="android.hardware.camera" />
 
@@ -14,6 +15,10 @@
             <action android:name="BOUNDSERVICE" />
         </intent-filter>
     </service>
+
+    <meta-data
+        android:name="io.fabric.ApiKey"
+        android:value="715f5a5fcc56c82419ae750f7ca7f729dcf6f506" />
 
     <application
         android:allowBackup="true"
@@ -36,6 +41,9 @@
             </intent-filter>
         </service>
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="715f5a5fcc56c82419ae750f7ca7f729dcf6f506" />
     </application>
 
 </manifest>

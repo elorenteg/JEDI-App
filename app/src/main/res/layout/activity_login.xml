@@ -47,33 +47,34 @@
             android:minWidth="200dp" />
     </android.support.design.widget.TextInputLayout>
 
-    <LinearLayout
+    <Button
+        android:id="@+id/buttonLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView"
+        android:layout_centerHorizontal="true"
+        android:width="30dp"
+        android:background="@color/grayBlueDark"
+        android:minWidth="200dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="@string/login"
+        android:textColor="@color/white" />
+
+    <com.twitter.sdk.android.core.identity.TwitterLoginButton
+        android:id="@+id/twitter_login_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp" />
+
+    <TextView
+        android:id="@+id/textNoAccount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/buttonLogin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textView"
-            android:layout_centerHorizontal="true"
-            android:layout_weight="1"
-            android:width="30dp"
-            android:background="@color/grayBlueDark"
-            android:text="@string/login"
-            android:textColor="@color/white"
-            android:layout_marginBottom="30dp"
-            android:minWidth="200dp" />
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/no_account"
-        android:id="@+id/textNoAccount"
-        android:layout_gravity="center_horizontal" />
+        android:paddingTop="10dp"
+        android:text="@string/no_account" />
 
 </LinearLayout>
