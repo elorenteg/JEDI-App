@@ -32,6 +32,8 @@ public class MediaPlayerService extends Service {
     private static MediaPlayer mediaPlayer;
     private static ArrayList<String> songs;
 
+    private static ArrayList<Integer> songsID;
+
     private int SONG_PLAYING;
     private Context context;
     private int NOTIFICATION_ID = 1;
@@ -44,10 +46,13 @@ public class MediaPlayerService extends Service {
     }
 
     public void onCreate() {
+        songsID = new ArrayList();
+        songsID.add(R.raw.because_of_you_taeyeon_tiffany);
+        songsID.add(R.raw.if_taeyeon);
+
         songs = new ArrayList();
-        songs.add("This is the best day ever - MCR.mp3");
-        songs.add("Because of You - TaeYeon & Tiffany.mp3");
-        songs.add("If - TaeYeon.mp3");
+        songs.add("because_of_you_taeyeon_tiffany.mp3");
+        songs.add("if_taeyeon.mp3");
 
         context = this;
         initMediaPlayer();
@@ -55,10 +60,8 @@ public class MediaPlayerService extends Service {
 
     public void initMediaPlayer() {
         SONG_PLAYING = 0;
-        File sdCard = Environment.getExternalStorageDirectory();
-        File song = new File(sdCard.getAbsolutePath() + "/Music/" + songs.get(SONG_PLAYING));
 
-        mediaPlayer = new MediaPlayer();
+        mediaPlayer = MediaPlayer.create(this, songsID.get(SONG_PLAYING));
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -68,15 +71,6 @@ public class MediaPlayerService extends Service {
                 newSong();
             }
         });
-
-        try {
-            mediaPlayer.setDataSource(song.getAbsolutePath());
-            mediaPlayer.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        //mediaPlayer.pause();
     }
 
     public String getSongName() {
@@ -153,17 +147,18 @@ public class MediaPlayerService extends Service {
     }
 
     public void newSong() {
-        File sdCard = Environment.getExternalStorageDirectory();
-        File song = new File(sdCard.getAbsolutePath() + "/Music/" + songs.get(SONG_PLAYING));
-
         mediaPlayer.reset();
 
-        try {
-            mediaPlayer.setDataSource(MediaPlayerService.this, Uri.parse(song.getAbsolutePath()));
-            mediaPlayer.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        mediaPlayer = MediaPlayer.create(this, songsID.get(SONG_PLAYING));
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                SONG_PLAYING = SONG_PLAYING + 1;
+                if (SONG_PLAYING == songs.size()) SONG_PLAYING = 0;
+                newSong();
+            }
+        });
 
         Toast.makeText(context, getSongName(), Toast.LENGTH_SHORT).show();
         sendNotification();

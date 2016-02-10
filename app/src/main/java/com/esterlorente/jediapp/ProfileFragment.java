@@ -227,8 +227,6 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         switch (requestCode) {
             case CAMERA_REQUEST:
                 if (resultCode == getActivity().RESULT_OK) {
-                    Log.e(TAG, "CAMARA");
-
                     Bitmap photo = (Bitmap) data.getExtras().get("data");
                     // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
                     Uri tempUri = getImageUri(getActivity().getApplicationContext(), photo);
@@ -236,15 +234,14 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
                     //Uri selectedImage = data.getData();
                     changeImageAndBackground(tempUri);
                     //performCrop(selectedImage);
-                } else Log.e(TAG, "CAMARA - error");
+                }
                 break;
             case GALLERY_REQUEST:
                 if (resultCode == getActivity().RESULT_OK) {
-                    Log.e(TAG, "GALERIA");
                     Uri selectedImage = data.getData();
                     changeImageAndBackground(selectedImage);
                     //performCrop(selectedImage);
-                } else Log.e(TAG, "GALERIA - error");
+                }
                 break;
         }
     }
@@ -268,23 +265,17 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         boolean imageExist = true;
         Bitmap bitmap = null;
         if (defaultImage) {
-            Log.e(TAG, "defaultImage");
-
             uri = uriImageDefault();
             bitmap = bitmapImageDefault();
         } else {
-            Log.e(TAG, "imagen guardada");
             if (!getRealPathFromURI(uri).equals("-1")) {
                 File imgFile = new File(getRealPathFromURI(uri).toString());
                 if (!imgFile.exists()) {
                     imageExist = false;
-                    Log.e(TAG, "img NO EXIST");
                 } else {
                     bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                    Log.e(TAG, "imag EXIST");
                 }
             } else {
-                Log.e(TAG, "pero borrada");
                 Toast.makeText(context, "Imagen borrada", Toast.LENGTH_SHORT).show();
 
                 uri = uriImageDefault();
@@ -450,9 +441,6 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
                             if (i == 0) textLongitude.setText("");
                             textLatitude.setText(String.valueOf(l.get(i).getLatitude()));
                             textLongitude.setText(String.valueOf(l.get(i).getLongitude()));
-
-                            Log.e(TAG, "Lat " + textLatitude.getText().toString());
-                            Log.e(TAG, "Long " + textLongitude.getText().toString());
                             //getFromLocation(l.get(i).getAddressLine(0).toString());
 
                             lm.removeUpdates(lis);

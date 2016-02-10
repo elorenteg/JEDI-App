@@ -1,13 +1,19 @@
 package com.esterlorente.jediapp;
 
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +23,9 @@ import android.widget.ImageView;
 
 import com.esterlorente.jediapp.data.LoginHelper;
 import com.esterlorente.jediapp.services.MediaPlayerService;
+
+import java.io.File;
+import java.io.FilenameFilter;
 
 public class MusicFragment extends Fragment implements View.OnClickListener {
     private String TAG = "MUSIC_FRAGMENT";
@@ -31,6 +40,14 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
     private MediaPlayerService mService;
     private boolean bound = false;
+
+    private static final int SONGS_REQUEST = 1;
+
+    private String[] mFileList;
+    private File mPath = new File(Environment.getExternalStorageDirectory() + "/Music/");
+    private String mChosenFile;
+    private static final String FTYPE = ".mp3";
+    private static final int DIALOG_LOAD_FILE = 1000;
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -87,7 +104,6 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.imagePlay:
-
                 if (bound) {
                     if (mService.isPlaying()) {
                         //buttonPlay.setText("Play");
@@ -201,11 +217,20 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
 
     public void updateLastNotification() {
-        Log.e(TAG, "Update notification");
         String songName = mService.getSongName();
 
         ContentValues valuesToStore = new ContentValues();
         valuesToStore.put(loginHelper.LAST_NOTIF, getString(R.string.reproduce_music) + " " + songName);
         loginHelper.updateUserTable(valuesToStore, username);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case SONGS_REQUEST:
+                if (resultCode == getActivity().RESULT_OK) {
+                    Log.e(TAG, "SONG_REQUEST OK");
+                    break;
+                }
+        }
     }
 }
