@@ -156,12 +156,14 @@ public class GameFragment extends Fragment implements ViewPager.OnPageChangeList
             case R.id.num4:
                 refreshFragment(4);
                 return true;
+            /*
             case R.id.num6:
                 refreshFragment(6);
                 return true;
             case R.id.num8:
                 refreshFragment(8);
                 return true;
+                */
         }
 
         return super.onOptionsItemSelected(item);
