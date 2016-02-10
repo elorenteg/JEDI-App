@@ -2,6 +2,7 @@ package com.esterlorente.jediapp;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +14,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.esterlorente.jediapp.data.LoginHelper;
 import com.esterlorente.jediapp.utils.MathEval;
@@ -167,83 +167,67 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
             case R.id.button_9:
             case R.id.button_dot:
             case R.id.button_del:
-                result = evaluateExpression(textOper.getText().toString());
-                textRes.setText(String.valueOf(result).replaceAll("\\.0*$", ""));
+                try {
+                    result = evaluateExpression(textOper.getText().toString());
+                    textRes.setText(String.valueOf(result).replaceAll("\\.0*$", ""));
+                } catch (ArithmeticException e) {
+                }
                 break;
             case R.id.button_equ:
-                result = evaluateExpression(textOper.getText().toString());
+                try {
+                    result = evaluateExpression(textOper.getText().toString());
+                    textRes.setText(String.valueOf(result).replaceAll("\\.0*$", ""));
 
-
-                Animation animOper = AnimationUtils.loadAnimation(context, R.anim.calc_oper);
-                animOper.reset();
-                textOper.clearAnimation();
-                animOper.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation arg0) {
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation arg0) {
-                        if (textRes.getText().equals("")) textOper.setText("");
-                        else textOper.setText(result);
-                    }
-                });
-                textOper.startAnimation(animOper);
-
-                Animation animRes = AnimationUtils.loadAnimation(context, R.anim.calc_res);
-                animRes.reset();
-                textRes.clearAnimation();
-
-                animRes.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation arg0) {
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation arg0) {
-                        textRes.setText("");
-                    }
-                });
-                textRes.startAnimation(animRes);
-
-
-
-
-                /*
-                AnimationSet animation = new AnimationSet(true);
-
-
-                float fromXposition = textOper.getX();
-                float toXPosition = textOper.getX();
-                float fromYPosition = textOper.getY();
-                float toYPosition = textOper.getX()-textOper.getHeight();
-                TranslateAnimation transRes = new TranslateAnimation(fromXposition, toXPosition, fromYPosition, toYPosition);
-                transRes.setDuration(700);
-                animation.addAnimation(transRes);
-
-
-                float fromXscale = 1.0f;
-                float toXscale = 2.0f;
-                float fromYscale = 1.0f;
-                float toYscale = 2.0f;
-                ScaleAnimation scaleRes = new ScaleAnimation(fromXscale, toXscale, fromYscale, toYscale);
-                scaleRes.setDuration(700);
-                animation.addAnimation(scaleRes);
-
-                textRes.startAnimation(animation);
-                */
-
-
+                    animateResult(result);
+                } catch (ArithmeticException e) {
+                    Snackbar snackbar = Snackbar
+                            .make(rootView, "Expression error", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                }
                 break;
         }
+    }
+
+    private void animateResult(final String result) {
+        Animation animOper = AnimationUtils.loadAnimation(context, R.anim.calc_oper);
+        animOper.reset();
+        textOper.clearAnimation();
+        animOper.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation arg0) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation arg0) {
+                if (textRes.getText().equals("")) textOper.setText("");
+                else textOper.setText(result);
+            }
+        });
+        textOper.startAnimation(animOper);
+
+        Animation animRes = AnimationUtils.loadAnimation(context, R.anim.calc_res);
+        animRes.reset();
+        textRes.clearAnimation();
+
+        animRes.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation arg0) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation arg0) {
+                textRes.setText("");
+            }
+        });
+        textRes.startAnimation(animRes);
     }
 
     private void initButtons() {
@@ -284,16 +268,14 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
         buttonDel.setOnClickListener(this);
     }
 
-    private String evaluateExpression(String text) {
+    private String evaluateExpression(String text) throws ArithmeticException {
         text = (String) textOper.getText();
         MathEval math = new MathEval();
         double result = -1;
         try {
             result = math.evaluate(text);
-        } catch (NumberFormatException e) {
-            Toast.makeText(context, "NumberFormatException", Toast.LENGTH_SHORT).show();
-        } catch (ArithmeticException e) {
-            Toast.makeText(context, "ArithmeticException", Toast.LENGTH_SHORT).show();
+        } catch (NumberFormatException | ArithmeticException e) {
+            throw new ArithmeticException();
         }
         return String.valueOf(result).replaceAll("\\.0*$", "");
     }
