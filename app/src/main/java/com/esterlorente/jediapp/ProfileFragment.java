@@ -243,7 +243,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
     private void updateImageByName(Uri uri) {
         ContentValues valuesToStore = new ContentValues();
         valuesToStore.put(loginHelper.IMAGE, uri.toString());
-        loginHelper.updateImageByName(valuesToStore, textUsername.getText().toString());
+        loginHelper.updateUserTable(valuesToStore, textUsername.getText().toString());
     }
 
     private void changeImageAndBackground(Uri uri) {
@@ -329,14 +329,14 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
     private void updateUserStreetByName() {
         ContentValues valuesToStore = new ContentValues();
         valuesToStore.put(loginHelper.STREET, textStreet.getText().toString());
-        loginHelper.updateUserStreetByName(valuesToStore, textUsername.getText().toString());
+        loginHelper.updateUserTable(valuesToStore, textUsername.getText().toString());
     }
 
     private void updateCoordinatesByName() {
         ContentValues valuesToStore = new ContentValues();
         valuesToStore.put(loginHelper.LATITUDE, textLatitude.getText().toString());
         valuesToStore.put(loginHelper.LONGITUDE, textLongitude.getText().toString());
-        loginHelper.updateUserCoordinatesByName(valuesToStore, textUsername.getText().toString());
+        loginHelper.updateUserTable(valuesToStore, textUsername.getText().toString());
     }
 
     @Override

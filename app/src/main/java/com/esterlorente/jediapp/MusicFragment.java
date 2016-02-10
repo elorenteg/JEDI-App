@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +35,6 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
     private MediaPlayerService mService;
     private boolean bound = false;
-    private int NOTIFICATION_ID = 1;
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -101,25 +101,28 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
                         //buttonPlay.setText("Pause");
                         imagePlay.setImageDrawable(getResources().getDrawable(R.drawable.pause));
                         mService.play();
-                        if (!isNotificationVisible()) sendNotification();
                     }
+
+                    // save notification
+                    updateLastNotification();
                 }
                 break;
             case R.id.imageNext:
                 if (bound) {
                     mService.next();
+                    updateLastNotification();
                 }
                 break;
             case R.id.imagePrevious:
                 if (bound) {
                     mService.previous();
+                    updateLastNotification();
                 }
                 break;
             case R.id.imageStop:
                 mService.stop();
                 //buttonPlay.setText("Play");
                 imagePlay.setImageDrawable(getResources().getDrawable(R.drawable.play));
-                deleteNotification();
                 break;
         }
     }
@@ -142,44 +145,6 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
             bound = false;
         }
     }
-
-    private void sendNotification() {
-        //Instanciamos Notification Manager
-        NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-
-        // Para la notificaciones, en lugar de crearlas directamente, lo hacemos mediante
-        // un Builder/contructor.
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText(getString(R.string.reproduce_music));
-        // Creamos un intent explicito, para abrir la app desde nuestra notificación
-        Intent resultIntent = new Intent(context, MusicFragment.class);
-        //Generamos la backstack y le añadimos el intent
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addParentStack(MainActivity.class);
-        stackBuilder.addNextIntent(resultIntent);
-        //Obtenemos el pending intent
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        mBuilder.setContentIntent(resultPendingIntent);
-
-        // mId es un identificador que nos permitirá actualizar la notificación
-        // más adelante
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-    }
-
-    private void deleteNotification() {
-        NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.cancel(NOTIFICATION_ID);
-    }
-
-    private boolean isNotificationVisible() {
-        Intent notificationIntent = new Intent(context, MainActivity.class);
-        PendingIntent test = PendingIntent.getActivity(context, NOTIFICATION_ID, notificationIntent, PendingIntent.FLAG_NO_CREATE);
-        return test != null;
-    }
-
 
     @Override
     public void onSaveInstanceState(Bundle outstate) {
@@ -236,15 +201,15 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
                 bound = false;
             }
         };
-
     }
 
 
-    private void updateLastNotification() {
+    public void updateLastNotification() {
+        Log.e(TAG, "Update notification");
         String songName = mService.getSongName();
 
         ContentValues valuesToStore = new ContentValues();
-        valuesToStore.put(loginHelper.LAST_NOTIF, "Escuchando " + songName);
-        loginHelper.updateLastNotification(valuesToStore, username);
+        valuesToStore.put(loginHelper.LAST_NOTIF, getString(R.string.reproduce_music) + " " + songName);
+        loginHelper.updateUserTable(valuesToStore, username);
     }
 }

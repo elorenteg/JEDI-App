@@ -147,14 +147,6 @@ public class LoginHelper extends SQLiteOpenHelper {
         );
     }
 
-    public void createScore(ContentValues values) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.insert(
-                SCORE_TABLE,
-                null,
-                values);
-    }
-
     public Cursor getAllScoresAndImagesByNumcard(String userentry, int numCards) {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] columns = {"us." + USERNAME, IMAGE, SCORE};
@@ -169,17 +161,6 @@ public class LoginHelper extends SQLiteOpenHelper {
                 SCORE + " ASC"                                                                                      // The sort order
         );
         return c;
-    }
-
-    public void updateImageByName(ContentValues values, String username) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        String[] where = {username};
-        db.update(
-                USER_TABLE,                             // The table to query
-                values,                                 // The new column values
-                USERNAME + "=?",                        // The columns for the WHERE clause
-                where                                   // The values for the WHERE clause
-        );
     }
 
     public Cursor getScoresByName(String username) {
@@ -198,29 +179,7 @@ public class LoginHelper extends SQLiteOpenHelper {
         return c;
     }
 
-    public void updateLastNotification(ContentValues values, String username) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        String[] where = {username};
-        db.update(
-                USER_TABLE,                             // The table to query
-                values,                                 // The new column values
-                USERNAME + "=?",                        // The columns for the WHERE clause
-                where                                   // The values for the WHERE clause
-        );
-    }
-
-    public void updateUserStreetByName(ContentValues values, String username) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        String[] where = {username};
-        db.update(
-                USER_TABLE,                             // The table to query
-                values,                                 // The new column values
-                USERNAME + "=?",                        // The columns for the WHERE clause
-                where                                   // The values for the WHERE clause
-        );
-    }
-
-    public void updateUserCoordinatesByName(ContentValues values, String username) {
+    public void updateUserTable(ContentValues values, String username) {
         SQLiteDatabase db = this.getWritableDatabase();
         String[] where = {username};
         db.update(

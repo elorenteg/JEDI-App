@@ -374,6 +374,6 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
     private void updateLastNotification() {
         ContentValues valuesToStore = new ContentValues();
         valuesToStore.put(loginHelper.LAST_NOTIF, getString(R.string.alert_mss) + " " + textAttempts.getText());
-        loginHelper.updateLastNotification(valuesToStore, username);
+        loginHelper.updateUserTable(valuesToStore, username);
     }
 }
