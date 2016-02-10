@@ -197,7 +197,8 @@ public class MediaPlayerService extends Service {
         // Para la notificaciones, en lugar de crearlas directamente, lo hacemos mediante
         // un Builder/contructor.
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(getNotificationIcon())
+                .setColor(getResources().getColor(R.color.colorPrimary))
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.reproduce_music) + " " + getSongName());
         // Creamos un intent explicito, para abrir la app desde nuestra notificación
@@ -225,6 +226,11 @@ public class MediaPlayerService extends Service {
         Intent notificationIntent = new Intent(context, MainActivity.class);
         PendingIntent test = PendingIntent.getActivity(context, NOTIFICATION_ID, notificationIntent, PendingIntent.FLAG_NO_CREATE);
         return test != null;
+    }
+
+    private int getNotificationIcon() {
+        boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
+        return useWhiteIcon ? R.drawable.icon3 : R.drawable.gato;
     }
 }
 
