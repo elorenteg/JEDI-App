@@ -17,6 +17,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +33,7 @@ import android.widget.Toast;
 import com.esterlorente.jediapp.data.LoginHelper;
 import com.esterlorente.jediapp.utils.ImageParser;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -198,7 +200,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
     }
 
     private void makeImageCamera() {
-        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(cameraIntent, CAMERA_REQUEST);
     }
 
@@ -225,19 +227,33 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         switch (requestCode) {
             case CAMERA_REQUEST:
                 if (resultCode == getActivity().RESULT_OK) {
-                    Uri selectedImage = data.getData();
-                    changeImageAndBackground(selectedImage);
+                    Log.e(TAG, "CAMARA");
+
+                    Bitmap photo = (Bitmap) data.getExtras().get("data");
+                    // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
+                    Uri tempUri = getImageUri(getActivity().getApplicationContext(), photo);
+
+                    //Uri selectedImage = data.getData();
+                    changeImageAndBackground(tempUri);
                     //performCrop(selectedImage);
-                }
+                } else Log.e(TAG, "CAMARA - error");
                 break;
             case GALLERY_REQUEST:
                 if (resultCode == getActivity().RESULT_OK) {
+                    Log.e(TAG, "GALERIA");
                     Uri selectedImage = data.getData();
                     changeImageAndBackground(selectedImage);
                     //performCrop(selectedImage);
-                }
+                } else Log.e(TAG, "GALERIA - error");
                 break;
         }
+    }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
     }
 
     private void updateImageByName(Uri uri) {
@@ -252,34 +268,33 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
         boolean imageExist = true;
         Bitmap bitmap = null;
         if (defaultImage) {
-            int defaultDrawable = R.drawable.gato5;
-            uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
-                    getResources().getResourcePackageName(defaultDrawable) + '/' +
-                    getResources().getResourceTypeName(defaultDrawable) + '/' +
-                    getResources().getResourceEntryName(defaultDrawable));
+            Log.e(TAG, "defaultImage");
 
-            bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.gato5);
+            uri = uriImageDefault();
+            bitmap = bitmapImageDefault();
         } else {
+            Log.e(TAG, "imagen guardada");
             if (!getRealPathFromURI(uri).equals("-1")) {
                 File imgFile = new File(getRealPathFromURI(uri).toString());
-                if (!imgFile.exists()) imageExist = false;
-                else bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                if (!imgFile.exists()) {
+                    imageExist = false;
+                    Log.e(TAG, "img NO EXIST");
+                } else {
+                    bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                    Log.e(TAG, "imag EXIST");
+                }
             } else {
+                Log.e(TAG, "pero borrada");
                 Toast.makeText(context, "Imagen borrada", Toast.LENGTH_SHORT).show();
 
-                int defaultDrawable = R.drawable.gato5;
-                uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
-                        getResources().getResourcePackageName(defaultDrawable) + '/' +
-                        getResources().getResourceTypeName(defaultDrawable) + '/' +
-                        getResources().getResourceEntryName(defaultDrawable));
-
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.gato5);
+                uri = uriImageDefault();
+                bitmap = bitmapImageDefault();
             }
         }
 
         imageProfile.setTag(uri.toString());
         ImageParser.roundEffect(getActivity(), imageProfile, uri);
-        updateImageByName(uri);
+        if (!defaultImage) updateImageByName(uri);
 
         if (imageExist) {
             final Bitmap bitmap1 = bitmap;
@@ -298,6 +313,18 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
                 }
             });
         } else Log.e(TAG, "Uri no valida");
+    }
+
+    private Uri uriImageDefault() {
+        int defaultDrawable = R.drawable.gato5;
+        return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
+                getResources().getResourcePackageName(defaultDrawable) + '/' +
+                getResources().getResourceTypeName(defaultDrawable) + '/' +
+                getResources().getResourceEntryName(defaultDrawable));
+    }
+
+    private Bitmap bitmapImageDefault() {
+        return BitmapFactory.decodeResource(context.getResources(), R.drawable.gato5);
     }
 
     private String getRealPathFromURI(Uri contentURI) {
@@ -404,30 +431,35 @@ public class ProfileFragment extends android.support.v4.app.Fragment implements 
             }
 
             @Override
-            public void onLocationChanged(Location location) {
+            public void onLocationChanged(final Location location) {
                 // TODO Auto-generated method stub
-                Geocoder gc = new Geocoder(getActivity().getApplicationContext());
-                try {
-                    l = gc.getFromLocation(location.getLatitude(),
-                            location.getLongitude(), 1);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                for (int i = 0; i < l.size(); ++i) {
-                    Log.v("LOG", l.get(i).getAddressLine(0).toString());
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
 
-                    if (i == 0) textLongitude.setText("");
-                    textLatitude.setText(String.valueOf(l.get(i).getLatitude()));
-                    textLongitude.setText(String.valueOf(l.get(i).getLongitude()));
+                        Geocoder gc = new Geocoder(getActivity());
+                        try {
+                            l = gc.getFromLocation(location.getLatitude(),
+                                    location.getLongitude(), 1);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        for (int i = 0; i < l.size(); ++i) {
+                            Log.v("LOG", l.get(i).getAddressLine(0).toString());
 
-                    Log.e(TAG, "Lat " + textLatitude.getText().toString());
-                    Log.e(TAG, "Long " + textLongitude.getText().toString());
-                    //getFromLocation(l.get(i).getAddressLine(0).toString());
+                            if (i == 0) textLongitude.setText("");
+                            textLatitude.setText(String.valueOf(l.get(i).getLatitude()));
+                            textLongitude.setText(String.valueOf(l.get(i).getLongitude()));
 
-                    lm.removeUpdates(lis);
-                    lm = null;
-                }
-                Log.v("LOG", ((Double) location.getLatitude()).toString());
+                            Log.e(TAG, "Lat " + textLatitude.getText().toString());
+                            Log.e(TAG, "Long " + textLongitude.getText().toString());
+                            //getFromLocation(l.get(i).getAddressLine(0).toString());
+
+                            lm.removeUpdates(lis);
+                            lm = null;
+                        }
+                    }
+                }, 0);
             }
         };
 
