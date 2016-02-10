@@ -66,6 +66,8 @@ public class MediaPlayerService extends Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        //mediaPlayer.pause();
     }
 
     public String getSongName() {
@@ -170,6 +172,10 @@ public class MediaPlayerService extends Service {
         SONG_PLAYING = song;
         newSong();
         mediaPlayer.seekTo(time);
+    }
+
+    public boolean mediaPlayerOn() {
+        return mediaPlayer != null;
     }
 }
 

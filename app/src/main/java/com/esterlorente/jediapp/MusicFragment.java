@@ -187,11 +187,13 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
         outstate.putString("title", getActivity().getTitle().toString());
 
-        outstate.putInt("Position", mService.getTimeMedia());
-        outstate.putBoolean("isplaying", mService.isPlaying());
-        outstate.putInt("song", mService.getSong());
+        if (bound && mService.mediaPlayerOn()) {
+            outstate.putInt("Position", mService.getTimeMedia());
+            outstate.putBoolean("isplaying", mService.isPlaying());
+            outstate.putInt("song", mService.getSong());
 
-        mService.stop();
+            mService.stop();
+        }
     }
 
     @Override
