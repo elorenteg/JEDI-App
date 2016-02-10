@@ -47,5 +47,6 @@
     <string name="newGame">Do you want to restart the game?</string>
     <string name="no">No</string>
     <string name="yes">Yes</string>
+    <string name="snack">SnackBar</string>
 
 </resources>

@@ -1,19 +1,28 @@
 package com.esterlorente.jediapp;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.esterlorente.jediapp.data.LoginHelper;
 import com.esterlorente.jediapp.utils.MathEval;
@@ -29,6 +38,11 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
     private Button button0, button1, button2, button3, button4, button5, button6, button7, button8, button9;
     private Button buttonPlus, buttonMin, buttonProd, buttonDiv, buttonDot, buttonEqu, buttonDel;
 
+    private int NOTIFICATION_BAR = 0;
+    private int NOTIFICATION_TOAST = 1;
+    private int NOTIFICATION_SNACKBAR = 2;
+    private int TYPE_NOTIFICATIONS;
+    private int NOTIFICATION_ID = 2;
 
     public CalculatorFragment() {
     }
@@ -51,15 +65,10 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
         textRes = (TextView) rootView.findViewById(R.id.text_res);
         textRes.setText("");
 
-        if (savedInstanceState != null) {
-            textOper.setText(savedInstanceState.getString("textOper"));
-            Log.v(TAG, "Restableciendo textOper: " + savedInstanceState.getString("textOper"));
-
-            textRes.setText(savedInstanceState.getString("textRes"));
-            Log.v(TAG, "Restableciendo textRes: " + savedInstanceState.getString("textRes"));
-        }
-
         initButtons();
+
+        SharedPreferences pref = context.getSharedPreferences("MyPref", Context.MODE_PRIVATE);
+        TYPE_NOTIFICATIONS = pref.getInt("type_notifications", NOTIFICATION_SNACKBAR);
 
         return rootView;
     }
@@ -71,6 +80,12 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
         outstate.putString("textOper", textOper.getText().toString());
         outstate.putString("textRes", textRes.getText().toString());
         outstate.putString("title", getActivity().getTitle().toString());
+
+        // Save type notification
+        SharedPreferences pref = context.getSharedPreferences("MyPref", Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editor = pref.edit();
+        editor.putInt("type_notifications", TYPE_NOTIFICATIONS);
+        editor.commit();
     }
 
     @Override
@@ -79,18 +94,10 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
 
         if (savedInstanceState != null) {
             getActivity().setTitle(savedInstanceState.getString("title"));
-        }
 
-        /*
-        if (savedInstanceState != null) {
             textOper.setText(savedInstanceState.getString("textOper"));
-            Log.v(TAG, "Restableciendo textOper: " + savedInstanceState.getString("textOper"));
-
             textRes.setText(savedInstanceState.getString("textRes"));
-            Log.v(TAG, "Restableciendo textRes: " + savedInstanceState.getString("textRes"));
         }
-
-*/
     }
 
 
@@ -166,11 +173,23 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
             case R.id.button_8:
             case R.id.button_9:
             case R.id.button_dot:
-            case R.id.button_del:
                 try {
                     result = evaluateExpression(textOper.getText().toString());
                     textRes.setText(String.valueOf(result).replaceAll("\\.0*$", ""));
                 } catch (ArithmeticException e) {
+                    Log.e(TAG, "error");
+                }
+                break;
+            case R.id.button_del:
+                if (textOper.getText().toString().equals("")) {
+                    textRes.setText("");
+                }
+                else {
+                    try {
+                        result = evaluateExpression(textOper.getText().toString());
+                        textRes.setText(String.valueOf(result).replaceAll("\\.0*$", ""));
+                    } catch (ArithmeticException e) {
+                    }
                 }
                 break;
             case R.id.button_equ:
@@ -180,11 +199,42 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
 
                     animateResult(result);
                 } catch (ArithmeticException e) {
-                    Snackbar snackbar = Snackbar
-                            .make(rootView, "Expression error", Snackbar.LENGTH_LONG);
-                    snackbar.show();
+                    showNotification("Expression error");
                 }
                 break;
+        }
+    }
+
+    private void showNotification(String message) {
+        if (TYPE_NOTIFICATIONS == NOTIFICATION_SNACKBAR) {
+            Snackbar snackbar = Snackbar
+                    .make(rootView, message, Snackbar.LENGTH_SHORT);
+            snackbar.show();
+        } else if (TYPE_NOTIFICATIONS == NOTIFICATION_TOAST) {
+            Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+        } else if (TYPE_NOTIFICATIONS == NOTIFICATION_BAR) {
+            NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+
+            // Para la notificaciones, en lugar de crearlas directamente, lo hacemos mediante
+            // un Builder/contructor.
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentTitle(getString(R.string.app_name))
+                    .setContentText(message);
+            // Creamos un intent explicito, para abrir la app desde nuestra notificación
+            Intent resultIntent = new Intent(context, MusicFragment.class);
+            //Generamos la backstack y le añadimos el intent
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+            stackBuilder.addParentStack(MainActivity.class);
+            stackBuilder.addNextIntent(resultIntent);
+            //Obtenemos el pending intent
+            PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            mBuilder.setContentIntent(resultPendingIntent);
+
+            // mId es un identificador que nos permitirá actualizar la notificación
+            // más adelante
+            mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
         }
     }
 
@@ -284,5 +334,39 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_calculator, menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.toasts:
+                TYPE_NOTIFICATIONS = NOTIFICATION_TOAST;
+                return true;
+            case R.id.state:
+                TYPE_NOTIFICATIONS = NOTIFICATION_BAR;
+                return true;
+            case R.id.snack:
+                TYPE_NOTIFICATIONS = NOTIFICATION_SNACKBAR;
+                return true;
+            case R.id.phone:
+                callNumber();
+                return true;
+            case R.id.browser:
+                openBrowser();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void callNumber() {
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse("tel:"));
+        startActivity(intent);
+    }
+
+    private void openBrowser() {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
+        startActivity(browserIntent);
     }
 }

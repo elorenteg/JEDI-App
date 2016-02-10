@@ -15,6 +15,9 @@
             <item
                 android:id="@+id/state"
                 android:title="@string/state" />
+            <item
+                android:id="@+id/snack"
+                android:title="@string/snack" />
         </menu>
     </item>
 
