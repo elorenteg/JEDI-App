@@ -104,7 +104,7 @@ public class SignupActivity extends AppCompatActivity {
 
     private void updateLastNotification(String name, String pass) {
         ContentValues valuesToStore = new ContentValues();
-        valuesToStore.put(loginHelper.LAST_NOTIF, getString(R.string.welcome) + name + "!");
+        valuesToStore.put(loginHelper.LAST_NOTIF, getString(R.string.welcome) + " " + name + "!");
         loginHelper.updateUserTable(valuesToStore, name);
     }
 
