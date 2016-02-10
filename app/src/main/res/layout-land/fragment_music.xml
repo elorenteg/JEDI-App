@@ -2,15 +2,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
     tools:context="com.esterlorente.jediapp.MusicFragment">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="top"
         android:layout_weight="1"
-        android:gravity="center_horizontal|top"
+        android:gravity="center_vertical|center_horizontal"
         android:orientation="vertical">
 
         <ImageView
@@ -24,9 +25,11 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="3"
         android:gravity="center_vertical|center_horizontal"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_weight="2">
 
         <ImageButton
             android:id="@+id/imagePrevious"
@@ -35,10 +38,10 @@
             android:adjustViewBounds="true"
             android:background="@null"
             android:maxHeight="50dp"
-            android:scaleType="fitCenter"
             android:maxWidth="50dp"
             android:minHeight="50dp"
             android:minWidth="50dp"
+            android:scaleType="fitCenter"
             android:src="@drawable/before" />
 
         <ImageButton
@@ -49,9 +52,9 @@
             android:background="@null"
             android:maxHeight="70dp"
             android:maxWidth="70dp"
-            android:scaleType="fitCenter"
             android:minHeight="70dp"
             android:minWidth="70dp"
+            android:scaleType="fitCenter"
             android:src="@drawable/play"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="2.5dp" />
@@ -62,11 +65,11 @@
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:background="@null"
-            android:scaleType="fitCenter"
             android:maxHeight="70dp"
             android:maxWidth="70dp"
             android:minHeight="70dp"
             android:minWidth="70dp"
+            android:scaleType="fitCenter"
             android:src="@drawable/stop"
             android:layout_marginLeft="2.5dp"
             android:layout_marginRight="5dp" />
