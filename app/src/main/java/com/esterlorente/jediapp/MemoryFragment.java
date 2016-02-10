@@ -206,14 +206,15 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
 
                                 if (minAttemps > score) {
                                     Log.e(TAG, "Mejora de marca!");
-                                    updateScore(username, numCards, score);
+                                    createOrUpdateScore(username, numCards, score);
                                     //notifyDataSetChanged();
                                 } else {
                                     Log.e(TAG, "No mejora :(");
+                                    createOrUpdateScore(username, numCards, score);
                                 }
                             } else {
                                 Log.e(TAG, "Primera marca! :D");
-                                createScore(username, numCards, score);
+                                createOrUpdateScore(username, numCards, score);
                             }
                             showEndGame();
                         }
@@ -258,18 +259,45 @@ public class MemoryFragment extends Fragment implements View.OnClickListener {
         alertDialog.show();
     }
 
-    private void createScore(String username, int numCards, int score) {
-        ContentValues valuesToStore = new ContentValues();
-        valuesToStore.put(loginHelper.USERNAME, username);
-        valuesToStore.put(loginHelper.SCORE, score);
-        valuesToStore.put(loginHelper.NUMCARDS, numCards);
-        loginHelper.createScore(valuesToStore);
+    private void createOrUpdateScore(String username, int numCards, int score) {
+        Cursor cursor1 = loginHelper.getAllUserNames();
+        ArrayList<String> allNames = new ArrayList();
+        if (cursor1.moveToFirst()) {
+            do {
+                allNames.add(cursor1.getString(cursor1.getColumnIndex(loginHelper.USERNAME)));
+            } while (cursor1.moveToNext());
+        }
+
+        Cursor cursor2 = loginHelper.getUsersWithEntry(username, numCards);
+        ArrayList<String> namesWithEntry = new ArrayList();
+        if (cursor2.moveToFirst()) {
+            do {
+                namesWithEntry.add(cursor2.getString(cursor2.getColumnIndex(loginHelper.USERENTRY)));
+            } while (cursor2.moveToNext());
+        }
+
+        // allNames -> usernames que no tienen la entrada
+        allNames.removeAll(namesWithEntry);
+
+        ContentValues[] valuesToStore = new ContentValues[allNames.size()];
+        for (int i = 0; i < allNames.size(); ++i) {
+            ContentValues value = new ContentValues();
+            value.put(loginHelper.USERENTRY, allNames.get(i));
+            value.put(loginHelper.USERNAME, username);
+            value.put(loginHelper.SCORE, score);
+            value.put(loginHelper.NUMCARDS, numCards);
+
+            valuesToStore[i] = value;
+        }
+
+        loginHelper.createScores(valuesToStore);        // creamos las entradas de los que no tengan al usuario
+        updateScore(username, numCards, score);         // actualizamos (si es) las entradas de los que lo tengan
     }
 
     private void updateScore(String username, int numCards, int score) {
         ContentValues valuesToStore = new ContentValues();
         valuesToStore.put(loginHelper.SCORE, score);
-        loginHelper.updateScoreByName(valuesToStore, username, numCards);
+        loginHelper.updateScoreByName(valuesToStore, username, numCards, score);
     }
 
     private void flipCard(final CardMemory cardMemory, final int newImage, int time) {

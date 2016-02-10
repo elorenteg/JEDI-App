@@ -183,8 +183,7 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
             case R.id.button_del:
                 if (textOper.getText().toString().equals("")) {
                     textRes.setText("");
-                }
-                else {
+                } else {
                     try {
                         result = evaluateExpression(textOper.getText().toString());
                         textRes.setText(String.valueOf(result).replaceAll("\\.0*$", ""));

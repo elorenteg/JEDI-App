@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class LoginHelper extends SQLiteOpenHelper {
 
     // Declaracion del nombre de la base de datos
-    public static final int DATABASE_VERSION = 9;
+    public static final int DATABASE_VERSION = 11;
 
     // Declaracion global de la version de la base de datos
     public static final String DATABASE_NAME = "USER_DB";
@@ -29,6 +29,7 @@ public class LoginHelper extends SQLiteOpenHelper {
     public static final String NUMCARDS = "numcards";
     public static final String LATITUDE = "latitude";
     public static final String LONGITUDE = "longitude";
+    public static final String USERENTRY = "userentry";
 
     // sentencia global de cracion de la base de datos
     public static final String USER_TABLE_CREATE = "CREATE TABLE " + USER_TABLE + " (" +
@@ -42,10 +43,11 @@ public class LoginHelper extends SQLiteOpenHelper {
             LONGITUDE + " TEXT);";
 
     public static final String SCORE_TABLE_CREATE = "CREATE TABLE " + SCORE_TABLE + " (" +
+            USERENTRY + " TEXT, " +
             USERNAME + " TEXT, " +
             SCORE + " INT, " +
             NUMCARDS + " INT," +
-            "PRIMARY KEY (" + USERNAME + "," + NUMCARDS + "));";
+            "PRIMARY KEY (" + USERENTRY + "," + USERNAME + "," + NUMCARDS + "));";
 
 
     public LoginHelper(Context context) {
@@ -121,27 +123,27 @@ public class LoginHelper extends SQLiteOpenHelper {
     public Cursor getUserScoreByName(String username, int numCards) {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] columns = {SCORE};
-        String[] where = {username, Integer.toString(numCards)};
+        String[] where = {username, username, Integer.toString(numCards)};
         Cursor c = db.query(
-                SCORE_TABLE,                            // The table to query
-                columns,                                // The columns to return
-                USERNAME + "=? AND " + NUMCARDS + "=?", // The columns for the WHERE clause
-                where,                                  // The values for the WHERE clause
-                null,                                   // don't group the rows
-                null,                                   // don't filter by row groups
-                null                                    // The sort order
+                SCORE_TABLE,                                                    // The table to query
+                columns,                                                        // The columns to return
+                USERENTRY + "=? AND " + USERNAME + "=? AND " + NUMCARDS + "=?", // The columns for the WHERE clause
+                where,                                                          // The values for the WHERE clause
+                null,                                                           // don't group the rows
+                null,                                                           // don't filter by row groups
+                null                                                            // The sort order
         );
         return c;
     }
 
-    public void updateScoreByName(ContentValues values, String username, int numCards) {
+    public void updateScoreByName(ContentValues values, String username, int numCards, int score) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String[] where = {username, Integer.toString(numCards)};
+        String[] where = {username, Integer.toString(numCards), Integer.toString(score)};
         db.update(
-                SCORE_TABLE,                            // The table to query
-                values,                                 // The new column values
-                USERNAME + "=? AND " + NUMCARDS + "=?", // The columns for the WHERE clause
-                where                                   // The values for the WHERE clause
+                SCORE_TABLE,                                                    // The table to query
+                values,                                                         // The new column values
+                USERNAME + "=? AND " + NUMCARDS + "=? AND " + SCORE + " >?",    // The columns for the WHERE clause
+                where                                                           // The values for the WHERE clause
         );
     }
 
@@ -153,18 +155,18 @@ public class LoginHelper extends SQLiteOpenHelper {
                 values);
     }
 
-    public Cursor getAllScoresAndImagesByNumcard(int numCards) {
+    public Cursor getAllScoresAndImagesByNumcard(String userentry, int numCards) {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] columns = {"us." + USERNAME, IMAGE, SCORE};
-        String[] where = {Integer.toString(numCards)};
+        String[] where = {userentry, Integer.toString(numCards)};
         Cursor c = db.query(
-                USER_TABLE + " us " + ", " + SCORE_TABLE + " sc",                            // The table to query
-                columns,                                // The columns to return
-                "us." + USERNAME + " = " + "sc." + USERNAME + " AND " + NUMCARDS + "=?", // The columns for the WHERE clause
-                where,                                  // The values for the WHERE clause
-                null,                                   // don't group the rows
-                null,                                   // don't filter by row groups
-                SCORE + " ASC"                         // The sort order
+                USER_TABLE + " us " + ", " + SCORE_TABLE + " sc",                                                   // The table to query
+                columns,                                                                                            // The columns to return
+                USERENTRY + " =? AND " + "us." + USERNAME + " = " + "sc." + USERNAME + " AND " + NUMCARDS + " =?",  // The columns for the WHERE clause
+                where,                                                                                              // The values for the WHERE clause
+                null,                                                                                               // don't group the rows
+                null,                                                                                               // don't filter by row groups
+                SCORE + " ASC"                                                                                      // The sort order
         );
         return c;
     }
@@ -183,15 +185,15 @@ public class LoginHelper extends SQLiteOpenHelper {
     public Cursor getScoresByName(String username) {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] columns = {SCORE, NUMCARDS};
-        String[] where = {username};
+        String[] where = {username, username};
         Cursor c = db.query(
-                SCORE_TABLE,                            // The table to query
-                columns,                                // The columns to return
-                USERNAME + "=?",                        // The columns for the WHERE clause
-                where,                                  // The values for the WHERE clause
-                null,                                   // don't group the rows
-                null,                                   // don't filter by row groups
-                null                                    // The sort order
+                SCORE_TABLE,                                // The table to query
+                columns,                                    // The columns to return
+                USERENTRY + " =? AND " + USERNAME + "=?",    // The columns for the WHERE clause
+                where,                                      // The values for the WHERE clause
+                null,                                       // don't group the rows
+                null,                                       // don't filter by row groups
+                null                                        // The sort order
         );
         return c;
     }
@@ -227,5 +229,58 @@ public class LoginHelper extends SQLiteOpenHelper {
                 USERNAME + "=?",                        // The columns for the WHERE clause
                 where                                   // The values for the WHERE clause
         );
+    }
+
+    public void createScores(ContentValues[] values) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            for (ContentValues value : values) {
+                db.insert(SCORE_TABLE, null, value);
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public Cursor getAllUserNames() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = {USERNAME};
+        Cursor c = db.query(
+                USER_TABLE,                                 // The table to query
+                columns,                                    // The columns to return
+                null,                                       // The columns for the WHERE clause
+                null,                                       // The values for the WHERE clause
+                null,                                       // don't group the rows
+                null,                                       // don't filter by row groups
+                null                                        // The sort order
+        );
+        return c;
+    }
+
+    public Cursor getUsersWithEntry(String username, int numCards) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = {USERENTRY};
+        String[] where = {username, Integer.toString(numCards)};
+        Cursor c = db.query(
+                SCORE_TABLE,                                // The table to query
+                columns,                                    // The columns to return
+                USERNAME + " =? AND " + NUMCARDS + "=?",    // The columns for the WHERE clause
+                where,                                      // The values for the WHERE clause
+                null,                                       // don't group the rows
+                null,                                       // don't filter by row groups
+                null                                        // The sort order
+        );
+        return c;
+    }
+
+    public void deleteScores(String userentry, int numCards) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] where = {userentry, Integer.toString(numCards)};
+        db.delete(
+                SCORE_TABLE,
+                USERENTRY + " =? AND " + NUMCARDS + "=?",
+                where);
     }
 }

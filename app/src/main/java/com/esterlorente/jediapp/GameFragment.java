@@ -69,9 +69,12 @@ public class GameFragment extends Fragment implements ViewPager.OnPageChangeList
         MemoryFragment memoryFragment = new MemoryFragment();
         memoryFragment.setArguments(b);
 
+        RanquingFragment ranquingFragment = new RanquingFragment();
+        ranquingFragment.setArguments(b);
+
         MyViewPagerAdapter adapter = new MyViewPagerAdapter(getChildFragmentManager());
         adapter.addFragment(memoryFragment, getString(R.string.memory));
-        adapter.addFragment(new RanquingFragment(), getString(R.string.ranquing));
+        adapter.addFragment(ranquingFragment, getString(R.string.ranquing));
         viewPager.setAdapter(adapter);
     }
 

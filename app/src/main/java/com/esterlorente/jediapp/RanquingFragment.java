@@ -37,6 +37,8 @@ public class RanquingFragment extends Fragment {
     private LinearLayoutManager mLinearLayout;
     private MyCustomAdapter adapter;
 
+    private String username;
+
     private int numCards = 4;
 
     public RanquingFragment() {
@@ -55,6 +57,11 @@ public class RanquingFragment extends Fragment {
         loginHelper = new LoginHelper(context);
         setHasOptionsMenu(true);
 
+        Bundle args = this.getArguments();
+        if (args != null) {
+            username = args.getString("username");
+        }
+
         initRanquing();
 
         return rootView;
@@ -63,7 +70,7 @@ public class RanquingFragment extends Fragment {
     private ArrayList<Score> getScoresByCard(int numCard) {
         ArrayList<Score> scores = new ArrayList();
 
-        Cursor cursor = loginHelper.getAllScoresAndImagesByNumcard(numCard);
+        Cursor cursor = loginHelper.getAllScoresAndImagesByNumcard(username, numCard);
         if (cursor.moveToFirst()) {
             do {
                 String username = cursor.getString(cursor.getColumnIndex(loginHelper.USERNAME));
@@ -151,6 +158,7 @@ public class RanquingFragment extends Fragment {
 
         switch (id) {
             case R.id.restart:
+                loginHelper.deleteScores(username, numCards);
                 ArrayList<Score> emptyScores = new ArrayList();
                 adapter.changeData(emptyScores);
                 return true;
@@ -196,25 +204,8 @@ public class RanquingFragment extends Fragment {
         //seg�n la estructura definida.
         //Asignamos nuestro custom Adapter
         ArrayList<Score> scores = getScoresByCard(numCards);
-        //scores = filterPostDelete(scores, numCards);
         adapter = new MyCustomAdapter(scores);
         mRecyclerView.setAdapter(adapter);
-    }
-
-    private ArrayList<Score> filterPostDelete(ArrayList<Score> scores, int numCards) {
-        /*
-        SharedPreferences pref = context.getSharedPreferences("MyPref", Context.MODE_PRIVATE);
-        String username = pref.getString("key_username", null);
-        if (username != null) {
-            loginUser(username);
-        }
-
-        ArrayList<Score> filteredScores = new ArrayList();
-        for (int i = 0; i < scores.size(); ++i) {
-
-        }
-        */
-        return null;
     }
 
     public void refresh(int numCards) {
