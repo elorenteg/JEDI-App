@@ -43,6 +43,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
     private static final String FTYPE = ".mp3";
     private static final int DIALOG_LOAD_FILE = 1000;
 
+    /*
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
@@ -63,6 +64,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
             bound = false;
         }
     };
+    */
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -79,8 +81,15 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
         initView();
 
+        initMediaPlayer();
 
         return rootView;
+    }
+
+    private void initMediaPlayer() {
+        Log.e(TAG, "initMediaPlayer");
+        mService = ((MainActivity) getActivity()).getMediaPlayerService();
+        bound = ((MainActivity) getActivity()).getBound();
     }
 
     private void initView() {
@@ -99,15 +108,19 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
+        if (mService == null) initMediaPlayer();
+
         switch (v.getId()) {
             case R.id.imagePlay:
                 if (bound) {
-                    if (mService.isPlaying()) {
+                    if (mService.isPlaying()) { // esta sonando, poner a pausa
+                        Log.e(TAG, "Pausando");
                         //buttonPlay.setText("Play");
                         imagePlay.setImageDrawable(getResources().getDrawable(R.drawable.play));
                         mService.pause();
-                    } else {
+                    } else { // esta en pausa, poner a play
                         //buttonPlay.setText("Pause");
+                        Log.e(TAG, "Playeando");
                         imagePlay.setImageDrawable(getResources().getDrawable(R.drawable.pause));
                         mService.play();
                     }
@@ -140,6 +153,14 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
     public void onStart() {
         super.onStart();
 
+        initMediaPlayer();
+    }
+
+    /*
+    @Override
+    public void onStart() {
+        super.onStart();
+
         Log.e(TAG, "onStart");
 
         Intent intent = new Intent(getActivity(), MediaPlayerService.class);
@@ -157,6 +178,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
             bound = false;
         }
     }
+    */
 
     @Override
     public void onSaveInstanceState(Bundle outstate) {
@@ -186,7 +208,10 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
             boolean isPlaying = savedInstanceState.getBoolean("isplaying");
             int song = savedInstanceState.getInt("song");
 
+            //initMediaPlayer();
+
             if (isPlaying) imagePlay.setImageDrawable(getResources().getDrawable(R.drawable.pause));
+
             //startService(position, isPlaying, song);
         }
     }

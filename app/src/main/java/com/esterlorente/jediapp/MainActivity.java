@@ -1,5 +1,6 @@
 package com.esterlorente.jediapp;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -9,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -28,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.esterlorente.jediapp.data.LoginHelper;
+import com.esterlorente.jediapp.services.MediaPlayerService;
 
 import java.io.File;
 
@@ -46,6 +49,30 @@ public class MainActivity extends AppCompatActivity {
 
     private MenuItem prevMenuItem = null;
     private String username;
+
+    private MediaPlayerService mService;
+    private boolean bound = false;
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            Log.e(TAG, "onServiceConnected");
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            MediaPlayerService.MediaPlayerBinder binder = (MediaPlayerService.MediaPlayerBinder) service;
+
+            mService = binder.getService();
+
+            bound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.e(TAG, "onServiceDisconnected");
+            bound = false;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -318,5 +345,33 @@ public class MainActivity extends AppCompatActivity {
     private void notAvailable() {
         Snackbar snackbar = Snackbar.make(rootView, "Settings not available", Snackbar.LENGTH_SHORT);
         snackbar.show();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Log.e(TAG, "onStart");
+
+        Intent intent = new Intent(this, MediaPlayerService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.e(TAG, "onStop");
+        if (bound) {
+            unbindService(mConnection);
+            bound = false;
+        }
+    }
+
+    public MediaPlayerService getMediaPlayerService() {
+        return mService;
+    }
+
+    public boolean getBound() {
+        return bound;
     }
 }
