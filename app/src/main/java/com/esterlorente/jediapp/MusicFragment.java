@@ -1,13 +1,8 @@
 package com.esterlorente.jediapp;
 
-import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,8 +13,6 @@ import android.widget.ImageView;
 
 import com.esterlorente.jediapp.data.LoginHelper;
 import com.esterlorente.jediapp.services.MediaPlayerService;
-
-import java.io.File;
 
 public class MusicFragment extends Fragment implements View.OnClickListener {
     private String TAG = "MUSIC_FRAGMENT";
@@ -34,37 +27,6 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
     private MediaPlayerService mService;
     private boolean bound = false;
-
-    private static final int SONGS_REQUEST = 1;
-
-    private String[] mFileList;
-    private File mPath = new File(Environment.getExternalStorageDirectory() + "/Music/");
-    private String mChosenFile;
-    private static final String FTYPE = ".mp3";
-    private static final int DIALOG_LOAD_FILE = 1000;
-
-    /*
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            Log.e(TAG, "onServiceConnected");
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            MediaPlayerService.MediaPlayerBinder binder = (MediaPlayerService.MediaPlayerBinder) service;
-
-            mService = binder.getService();
-
-            bound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            Log.e(TAG, "onServiceDisconnected");
-            bound = false;
-        }
-    };
-    */
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -115,11 +77,9 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
                 if (bound) {
                     if (mService.isPlaying()) { // esta sonando, poner a pausa
                         Log.e(TAG, "Pausando");
-                        //buttonPlay.setText("Play");
                         imagePlay.setImageDrawable(getResources().getDrawable(R.drawable.play));
                         mService.pause();
                     } else { // esta en pausa, poner a play
-                        //buttonPlay.setText("Pause");
                         Log.e(TAG, "Playeando");
                         imagePlay.setImageDrawable(getResources().getDrawable(R.drawable.pause));
                         mService.play();
@@ -143,7 +103,6 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.imageStop:
                 mService.stop();
-                //buttonPlay.setText("Play");
                 imagePlay.setImageDrawable(getResources().getDrawable(R.drawable.play));
                 break;
         }
@@ -155,30 +114,6 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
         initMediaPlayer();
     }
-
-    /*
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        Log.e(TAG, "onStart");
-
-        Intent intent = new Intent(getActivity(), MediaPlayerService.class);
-        ((MainActivity) getActivity()).startBindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        //bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.e(TAG, "onStop");
-        if (bound) {
-            ((MainActivity) getActivity()).unBindService(mConnection);
-            //unbindService(mConnection);
-            bound = false;
-        }
-    }
-    */
 
     @Override
     public void onSaveInstanceState(Bundle outstate) {
@@ -216,51 +151,11 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    /*
-
-    private void startService(final int position, final boolean isPlaying, final int song) {
-        mConnection = new ServiceConnection() {
-
-            @Override
-            public void onServiceConnected(ComponentName className,
-                                           IBinder service) {
-                // We've bound to LocalService, cast the IBinder and get LocalService instance
-                MediaPlayerService.MediaPlayerBinder binder = (MediaPlayerService.MediaPlayerBinder) service;
-
-                mService = binder.getService();
-                mService.restartMediaPlayer(song, position);
-                if (isPlaying) {
-                    mService.play();
-                    //buttonPlay.setText("Pause");
-                    imagePlay.setImageDrawable(getResources().getDrawable(R.drawable.pause));
-                }
-
-                bound = true;
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName arg0) {
-                bound = false;
-            }
-        };
-    }
-*/
-
     public void updateLastNotification() {
         String songName = mService.getSongName();
 
         ContentValues valuesToStore = new ContentValues();
         valuesToStore.put(loginHelper.LAST_NOTIF, getString(R.string.reproduce_music) + " " + songName);
         loginHelper.updateUserTable(valuesToStore, username);
-    }
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case SONGS_REQUEST:
-                if (resultCode == getActivity().RESULT_OK) {
-                    Log.e(TAG, "SONG_REQUEST OK");
-                    break;
-                }
-        }
     }
 }

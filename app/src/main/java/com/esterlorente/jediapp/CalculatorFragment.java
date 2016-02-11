@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -22,7 +21,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.esterlorente.jediapp.data.LoginHelper;
 import com.esterlorente.jediapp.utils.MathEval;
@@ -205,31 +203,31 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
     }
 
     private void showNotification(String message) {
-            //Instanciamos Notification Manager
-            NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        //Instanciamos Notification Manager
+        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-            // Para la notificaciones, en lugar de crearlas directamente, lo hacemos mediante
-            // un Builder/contructor.
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(getNotificationIcon())
-                    .setColor(getResources().getColor(R.color.colorPrimary))
-                    .setContentTitle(getString(R.string.app_name))
-                    .setContentText(message);
-            // Creamos un intent explicito, para abrir la app desde nuestra notificación
-            Intent resultIntent = new Intent(context, MusicFragment.class);
-            //Generamos la backstack y le añadimos el intent
-            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-            stackBuilder.addParentStack(MainActivity.class);
-            stackBuilder.addNextIntent(resultIntent);
-            //Obtenemos el pending intent
-            PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        // Para la notificaciones, en lugar de crearlas directamente, lo hacemos mediante
+        // un Builder/contructor.
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+                .setSmallIcon(getNotificationIcon())
+                .setColor(getResources().getColor(R.color.colorPrimary))
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(message);
+        // Creamos un intent explicito, para abrir la app desde nuestra notificación
+        Intent resultIntent = new Intent(context, MusicFragment.class);
+        //Generamos la backstack y le añadimos el intent
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        //Obtenemos el pending intent
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            mBuilder.setContentIntent(resultPendingIntent);
+        mBuilder.setContentIntent(resultPendingIntent);
 
-            // mId es un identificador que nos permitirá actualizar la notificación
-            // más adelante
-            mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-        }
+        // mId es un identificador que nos permitirá actualizar la notificación
+        // más adelante
+        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+    }
 
     private void animateResult(final String result) {
         Animation animOper = AnimationUtils.loadAnimation(context, R.anim.calc_oper);

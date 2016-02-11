@@ -315,16 +315,6 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
-    public void startBindService(Intent intent, ServiceConnection mConnection, int bindAutoCreate) {
-        //Log.e(TAG, "Bind Service");
-        bindService(intent, mConnection, bindAutoCreate);
-    }
-
-    public void unBindService(ServiceConnection mConnection) {
-        //Log.e(TAG, "Unbind Service");
-        unbindService(mConnection);
-    }
-
     public void updateNavHeader(final Bitmap bitmap) {
         final View header = navigationView.getHeaderView(0);
         final ImageView imageUsername = (ImageView) header.findViewById(R.id.navview_image);
