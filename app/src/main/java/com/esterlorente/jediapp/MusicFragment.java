@@ -108,7 +108,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        if (mService == null) initMediaPlayer();
+        if (mService == null || !mService.mediaPlayerOn()) initMediaPlayer();
 
         switch (v.getId()) {
             case R.id.imagePlay:
