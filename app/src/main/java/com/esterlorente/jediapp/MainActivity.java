@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String FRAGMENT_TAG;
     private Fragment fragment;
+    private View rootView;
 
     private Context context;
     private Toolbar toolbar;
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        rootView = findViewById(R.id.content_frame);
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
@@ -152,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
                         tag = R.string.calculator;
                         break;
                     case R.id.menu_settings:
+                        notAvailable();
                         break;
                 }
 
@@ -214,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.settings:
-                // TODO: settings
+                notAvailable();
                 return true;
             case R.id.logout:
                 logoutUser();
@@ -309,5 +313,10 @@ public class MainActivity extends AppCompatActivity {
                 imageUsername.setImageBitmap(bitmap3);
             }
         });
+    }
+
+    private void notAvailable() {
+        Snackbar snackbar = Snackbar.make(rootView, "Settings not available", Snackbar.LENGTH_SHORT);
+        snackbar.show();
     }
 }
