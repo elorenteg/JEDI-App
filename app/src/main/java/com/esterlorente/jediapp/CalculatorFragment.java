@@ -205,19 +205,14 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
     }
 
     private void showNotification(String message) {
-        if (TYPE_NOTIFICATIONS == NOTIFICATION_SNACKBAR) {
-            Snackbar snackbar = Snackbar
-                    .make(rootView, message, Snackbar.LENGTH_SHORT);
-            snackbar.show();
-        } else if (TYPE_NOTIFICATIONS == NOTIFICATION_TOAST) {
-            Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
-        } else if (TYPE_NOTIFICATIONS == NOTIFICATION_BAR) {
-            NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+            //Instanciamos Notification Manager
+            NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
             // Para la notificaciones, en lugar de crearlas directamente, lo hacemos mediante
             // un Builder/contructor.
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setSmallIcon(getNotificationIcon())
+                    .setColor(getResources().getColor(R.color.colorPrimary))
                     .setContentTitle(getString(R.string.app_name))
                     .setContentText(message);
             // Creamos un intent explicito, para abrir la app desde nuestra notificación
@@ -235,7 +230,6 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
             // más adelante
             mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
         }
-    }
 
     private void animateResult(final String result) {
         Animation animOper = AnimationUtils.loadAnimation(context, R.anim.calc_oper);
@@ -367,5 +361,10 @@ public class CalculatorFragment extends Fragment implements View.OnClickListener
     private void openBrowser() {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
         startActivity(browserIntent);
+    }
+
+    private int getNotificationIcon() {
+        boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
+        return useWhiteIcon ? R.drawable.icon3 : R.drawable.gato;
     }
 }

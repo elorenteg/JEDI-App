@@ -48,6 +48,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
         @Override
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
+            Log.e(TAG, "onServiceConnected");
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             MediaPlayerService.MediaPlayerBinder binder = (MediaPlayerService.MediaPlayerBinder) service;
 
@@ -58,12 +59,14 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
+            Log.e(TAG, "onServiceDisconnected");
             bound = false;
         }
     };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.e(TAG, "onCreateView");
         rootView = inflater.inflate(R.layout.fragment_music, container, false);
         context = getActivity();
         loginHelper = new LoginHelper(context);
@@ -137,6 +140,8 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
     public void onStart() {
         super.onStart();
 
+        Log.e(TAG, "onStart");
+
         Intent intent = new Intent(getActivity(), MediaPlayerService.class);
         ((MainActivity) getActivity()).startBindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         //bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
@@ -145,6 +150,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStop() {
         super.onStop();
+        Log.e(TAG, "onStop");
         if (bound) {
             ((MainActivity) getActivity()).unBindService(mConnection);
             //unbindService(mConnection);
@@ -155,6 +161,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onSaveInstanceState(Bundle outstate) {
         super.onSaveInstanceState(outstate);
+        Log.e(TAG, "onSaveInstanceState");
 
         outstate.putString("title", getActivity().getTitle().toString());
 
@@ -163,13 +170,14 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
             outstate.putBoolean("isplaying", mService.isPlaying());
             outstate.putInt("song", mService.getSong());
 
-            mService.stop();
+            //mService.stop();
         }
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Log.e(TAG, "onActivityCreated");
 
         if (savedInstanceState != null) {
             getActivity().setTitle(savedInstanceState.getString("title"));
@@ -178,9 +186,12 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
             boolean isPlaying = savedInstanceState.getBoolean("isplaying");
             int song = savedInstanceState.getInt("song");
 
-            startService(position, isPlaying, song);
+            if (isPlaying) imagePlay.setImageDrawable(getResources().getDrawable(R.drawable.pause));
+            //startService(position, isPlaying, song);
         }
     }
+
+    /*
 
     private void startService(final int position, final boolean isPlaying, final int song) {
         mConnection = new ServiceConnection() {
@@ -208,7 +219,7 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
             }
         };
     }
-
+*/
 
     public void updateLastNotification() {
         String songName = mService.getSongName();

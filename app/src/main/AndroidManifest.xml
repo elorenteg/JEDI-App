@@ -36,7 +36,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".SignupActivity" />
-        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="keyboardHidden|orientation" />
 
         <service android:name=".services.MediaPlayerService">
             <intent-filter>
