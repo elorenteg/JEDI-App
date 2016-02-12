@@ -1,6 +1,5 @@
 package com.esterlorente.jediapp;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -10,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -50,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem prevMenuItem = null;
     private String username;
 
+    /*
     private MediaPlayerService mService;
     private boolean bound = false;
 
@@ -73,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
             bound = false;
         }
     };
+    */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -337,11 +337,15 @@ public class MainActivity extends AppCompatActivity {
         snackbar.show();
     }
 
+
     @Override
     public void onStart() {
         super.onStart();
 
         Log.e(TAG, "onStart");
+
+        GlobalApplication state = ((GlobalApplication) getApplication());
+        ServiceConnection mConnection = state.getmConnection();
 
         Intent intent = new Intent(this, MediaPlayerService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
@@ -351,17 +355,14 @@ public class MainActivity extends AppCompatActivity {
     public void onStop() {
         super.onStop();
         Log.e(TAG, "onStop");
+
+        GlobalApplication state = ((GlobalApplication) getApplication());
+        ServiceConnection mConnection = state.getmConnection();
+        boolean bound = state.isBound();
+
         if (bound) {
             unbindService(mConnection);
             bound = false;
         }
-    }
-
-    public MediaPlayerService getMediaPlayerService() {
-        return mService;
-    }
-
-    public boolean getBound() {
-        return bound;
     }
 }

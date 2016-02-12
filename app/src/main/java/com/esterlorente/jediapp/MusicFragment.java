@@ -43,16 +43,19 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
         initView();
 
-        initMediaPlayer();
+        //initMediaPlayer();
+        initService();
 
         return rootView;
     }
 
+    /*
     private void initMediaPlayer() {
         Log.e(TAG, "initMediaPlayer");
         mService = ((MainActivity) getActivity()).getMediaPlayerService();
         bound = ((MainActivity) getActivity()).getBound();
     }
+    */
 
     private void initView() {
         imageCover = (ImageView) rootView.findViewById(R.id.imageCover);
@@ -70,7 +73,10 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        if (mService == null || !mService.mediaPlayerOn()) initMediaPlayer();
+        if (mService == null || !mService.mediaPlayerOn()) {
+            initService();
+            //initMediaPlayer();
+        }
 
         switch (v.getId()) {
             case R.id.imagePlay:
@@ -112,7 +118,8 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
     public void onStart() {
         super.onStart();
 
-        initMediaPlayer();
+        //initMediaPlayer();
+        initService();
     }
 
     @Override
@@ -157,5 +164,11 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
         ContentValues valuesToStore = new ContentValues();
         valuesToStore.put(loginHelper.LAST_NOTIF, getString(R.string.reproduce_music) + " " + songName);
         loginHelper.updateUserTable(valuesToStore, username);
+    }
+
+    private void initService() {
+        GlobalApplication state = ((GlobalApplication) getActivity().getApplication());
+        mService = state.getmService();
+        bound = state.isBound();
     }
 }

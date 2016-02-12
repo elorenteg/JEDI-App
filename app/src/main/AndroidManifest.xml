@@ -24,6 +24,7 @@
         android:value="715f5a5fcc56c82419ae750f7ca7f729dcf6f506" />
 
     <application
+        android:name=".GlobalApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
