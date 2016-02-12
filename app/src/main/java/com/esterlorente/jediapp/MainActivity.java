@@ -2,7 +2,6 @@ package com.esterlorente.jediapp;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -28,7 +27,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.esterlorente.jediapp.data.LoginHelper;
-import com.esterlorente.jediapp.services.MediaPlayerService;
 
 import java.io.File;
 
@@ -47,32 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
     private MenuItem prevMenuItem = null;
     private String username;
-
-    /*
-    private MediaPlayerService mService;
-    private boolean bound = false;
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            Log.e(TAG, "onServiceConnected");
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            MediaPlayerService.MediaPlayerBinder binder = (MediaPlayerService.MediaPlayerBinder) service;
-
-            mService = binder.getService();
-
-            bound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            Log.e(TAG, "onServiceDisconnected");
-            bound = false;
-        }
-    };
-    */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Fragment f = null;
                 int tag = -1;
+                boolean isNew = true;
 
                 // Check to see which item was being clicked and perform appropriate action
                 switch (menuItem.getItemId()) {
@@ -170,7 +143,12 @@ public class MainActivity extends AppCompatActivity {
                         tag = R.string.profile;
                         break;
                     case R.id.menu_music:
-                        f = new MusicFragment();
+                        FragmentManager fragmentManager = getSupportFragmentManager();
+
+                        f = fragmentManager.findFragmentByTag(getString(R.string.music));
+                        if (f == null) {
+                            f = new MusicFragment();
+                        } else isNew = false;
                         tag = R.string.music;
                         break;
                     case R.id.menu_game:
@@ -185,15 +163,14 @@ public class MainActivity extends AppCompatActivity {
                         notAvailable();
                         break;
                 }
+                fragment = f;
+                FRAGMENT_TAG = getString(tag);
+                setTitle(FRAGMENT_TAG);
 
-                if (f != null) {
+                if (f != null && isNew == true) {
                     Bundle b = new Bundle();
                     b.putString("username", username);
                     f.setArguments(b);
-
-                    fragment = f;
-                    FRAGMENT_TAG = getString(tag);
-                    setTitle(FRAGMENT_TAG);
                     initFragment();
                 }
 
@@ -335,34 +312,5 @@ public class MainActivity extends AppCompatActivity {
     private void notAvailable() {
         Snackbar snackbar = Snackbar.make(rootView, "Settings not available", Snackbar.LENGTH_SHORT);
         snackbar.show();
-    }
-
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        Log.e(TAG, "onStart");
-
-        GlobalApplication state = ((GlobalApplication) getApplication());
-        ServiceConnection mConnection = state.getmConnection();
-
-        Intent intent = new Intent(this, MediaPlayerService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.e(TAG, "onStop");
-
-        GlobalApplication state = ((GlobalApplication) getApplication());
-        ServiceConnection mConnection = state.getmConnection();
-        boolean bound = state.isBound();
-
-        if (bound) {
-            unbindService(mConnection);
-            bound = false;
-        }
     }
 }

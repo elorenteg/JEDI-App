@@ -1,8 +1,12 @@
 package com.esterlorente.jediapp;
 
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,6 +32,27 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
     private MediaPlayerService mService;
     private boolean bound = false;
 
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            Log.e(TAG, "onServiceConnected");
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            MediaPlayerService.MediaPlayerBinder binder = (MediaPlayerService.MediaPlayerBinder) service;
+
+            mService = binder.getService();
+
+            bound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.e(TAG, "onServiceDisconnected");
+            bound = false;
+        }
+    };
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.e(TAG, "onCreateView");
@@ -43,19 +68,8 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
         initView();
 
-        //initMediaPlayer();
-        initService();
-
         return rootView;
     }
-
-    /*
-    private void initMediaPlayer() {
-        Log.e(TAG, "initMediaPlayer");
-        mService = ((MainActivity) getActivity()).getMediaPlayerService();
-        bound = ((MainActivity) getActivity()).getBound();
-    }
-    */
 
     private void initView() {
         imageCover = (ImageView) rootView.findViewById(R.id.imageCover);
@@ -73,11 +87,6 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        if (mService == null || !mService.mediaPlayerOn()) {
-            initService();
-            //initMediaPlayer();
-        }
-
         switch (v.getId()) {
             case R.id.imagePlay:
                 if (bound) {
@@ -108,18 +117,12 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
                 }
                 break;
             case R.id.imageStop:
-                mService.stop();
-                imagePlay.setImageDrawable(getResources().getDrawable(R.drawable.play));
+                if (bound) {
+                    mService.stop();
+                    imagePlay.setImageDrawable(getResources().getDrawable(R.drawable.play));
+                }
                 break;
         }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        //initMediaPlayer();
-        initService();
     }
 
     @Override
@@ -166,9 +169,25 @@ public class MusicFragment extends Fragment implements View.OnClickListener {
         loginHelper.updateUserTable(valuesToStore, username);
     }
 
-    private void initService() {
-        GlobalApplication state = ((GlobalApplication) getActivity().getApplication());
-        mService = state.getmService();
-        bound = state.isBound();
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Log.e(TAG, "onStart");
+
+        setRetainInstance(true);
+        Intent intent = new Intent(getActivity().getApplicationContext(), MediaPlayerService.class);
+        getActivity().getApplicationContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.e(TAG, "onDestroy");
+
+        if (bound) {
+            getActivity().getApplicationContext().unbindService(mConnection);
+            bound = false;
+        }
     }
 }
